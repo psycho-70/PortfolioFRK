@@ -222,7 +222,7 @@ const WorkExperienceShowcase: React.FC = () => {
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="inline-block mb-4"
+            className="inline-block mb-2"
           >
             <div className={`p-4 rounded-2xl ${darkMode ? 'bg-gray-800/50' : 'bg-white/50'} backdrop-blur-lg`}>
               <Briefcase className={`w-8 h-8 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
