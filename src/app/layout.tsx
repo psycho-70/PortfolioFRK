@@ -4,15 +4,6 @@ import "./globals.css";
 import { AppProvider } from "@/Context/AppContext";
 import Navbar from "@/Components/Header&Footer/Navbar";
 import Footer from "@/Components/Header&Footer/Footer";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,7 +18,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      cz-shortcut-listen="true"
+        // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
                 <div>
         <AppProvider>

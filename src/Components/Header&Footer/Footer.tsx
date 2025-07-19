@@ -45,15 +45,15 @@ const Footer: React.FC = () => {
                 className={`absolute opacity-30 animate-float ${
                     darkMode ? 'bg-gradient-to-r from-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-400 to-purple-400'
                 }`}
-                style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    width: `${Math.random() * 20 + 10}px`,
-                    height: `${Math.random() * 20 + 10}px`,
-                    borderRadius: Math.random() > 0.5 ? '50%' : '0%',
-                    animationDelay: `${Math.random() * 5}s`,
-                    animationDuration: `${Math.random() * 10 + 15}s`
-                }}
+                // style={{
+                //     left: `${Math.random() * 100}%`,
+                //     top: `${Math.random() * 100}%`,
+                //     width: `${Math.random() * 20 + 10}px`,
+                //     height: `${Math.random() * 20 + 10}px`,
+                //     borderRadius: Math.random() > 0.5 ? '50%' : '0%',
+                //     animationDelay: `${Math.random() * 5}s`,
+                //     animationDuration: `${Math.random() * 10 + 15}s`
+                // }}
             />
         ));
     };
