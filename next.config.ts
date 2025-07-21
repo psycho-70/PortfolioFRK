@@ -9,14 +9,8 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
   },
-  // Webpack configuration to ensure all files are included
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.(css)$/,
-      use: ['style-loader', 'css-loader', 'postcss-loader']
-    });
-    return config;
-  }
+ 
+  
 }
 
 export default nextConfig
