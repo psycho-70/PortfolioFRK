@@ -2,7 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // REMOVE: experimental.typedRoutes or appDir
+  images: {
+    domains: ['images.unsplash.com'], // ✅ Add this line
+  },
 }
 
 export default nextConfig

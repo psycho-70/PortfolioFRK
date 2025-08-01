@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { 
   Box, 
   IconButton, 
@@ -12,7 +11,6 @@ import {
 import { Send, Close, SmartToy } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Types
 interface Message {
   text: string;
   sender: 'user' | 'ai';
@@ -20,11 +18,12 @@ interface Message {
 }
 
 interface ChatbotProps {
-  onClose: any;
+  onClose: () => void;
   darkMode?: boolean;
 }
 
-const Chatbot: React.FC<ChatbotProps> = ({ onClose, darkMode }) => {
+const Chatbot: React.FC<ChatbotProps> = ({ onClose, darkMode = false }) => {
+    const API_URL: string =  'http://localhost:5000';
   const [messages, setMessages] = useState<Message[]>([
     { 
       text: "Hello! I'm your AI portfolio assistant. Ask me about my skills, projects, or experience!", 
@@ -32,81 +31,74 @@ const Chatbot: React.FC<ChatbotProps> = ({ onClose, darkMode }) => {
       id: Date.now()
     }
   ]);
-  const [input, setInput] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Initialize Gemini - IMPORTANT: In production, call a backend service instead
-  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
 
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = async (): Promise<void> => {
-    if (input.trim() === '' || isLoading) return;
-    
-    // Add user message
-    const userMessage: Message = { 
-      text: input, 
-      sender: 'user',
-      id: Date.now() + 1
-    };
-    setMessages(prev => [...prev, userMessage]);
-    const currentInput = input;
-    setInput('');
-    setIsLoading(true);
-    
-    try {
-      // Get the generative model
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      
-      // Create a prompt that includes portfolio context
-      const prompt = `
-        You are an AI assistant for a professional portfolio website. 
-        The user is a potential employer or client. 
-        Answer questions professionally and keep responses concise.
-        The portfolio includes skills, projects, work experience, and services.
-        
-        Current conversation:
-        ${messages.slice(-5).map(m => `${m.sender}: ${m.text}`).join('\n')}
-        
-        User question: ${currentInput}
-      `;
-      
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      // Add AI message
-      const aiMessage: Message = { 
-        text: text.replace(/\*\*/g, ''), // Remove markdown bold
-        sender: 'ai',
-        id: Date.now() + 2
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error("Error calling Gemini:", error);
-      const errorMessage: Message = { 
-        text: "Sorry, I'm having trouble responding. Please try again later.", 
-        sender: 'ai',
-        id: Date.now() + 3
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSend = async () => {
+  if (input.trim() === '' || isLoading) return;
+  
+  // Add user message
+  const userMessage: Message = { 
+    text: input, 
+    sender: 'user',
+    id: Date.now() + 1
   };
+  setMessages(prev => [...prev, userMessage]);
+  setInput('');
+  setIsLoading(true);
+  
+  try {
+    const response = await fetch('https://backendproject-01.vercel.app/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages,
+        currentInput: input
+      }),
+    });
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (e.key === 'Enter') {
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('Received non-JSON response:', text);
+      throw new Error('Backend returned an unexpected response');
+    }
+
+    const data = await response.json();
+    
+    // Add AI response
+    const aiMessage: Message = {
+      text: data.response,
+      sender: 'ai',
+      id: Date.now() + 2
+    };
+    setMessages(prev => [...prev, aiMessage]);
+    
+  } catch (error) {
+    console.error("API Error:", error);
+    setMessages(prev => [...prev, {
+      text: "Connection error. Please make sure the backend server is running.",
+      sender: 'ai',
+      id: Date.now() + 3
+    }]);
+  } finally {
+    setIsLoading(false); // Make sure to set loading to false in all cases
+  }
+};
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSend();
     }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setInput(e.target.value);
   };
 
   return (
@@ -191,17 +183,19 @@ const Chatbot: React.FC<ChatbotProps> = ({ onClose, darkMode }) => {
             size="small"
             placeholder="Ask about my projects..."
             value={input}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyPress}
             disabled={isLoading}
+            multiline
+            maxRows={4}
             className="flex-1"
             sx={{
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {
-                    borderColor: darkMode ? '#4B5563' : '#E5E7EB',
+                  borderColor: darkMode ? '#4B5563' : '#E5E7EB',
                 },
                 '&:hover fieldset': {
-                    borderColor: darkMode ? '#6B7280' : '#D1D5DB',
+                  borderColor: darkMode ? '#6B7280' : '#D1D5DB',
                 },
                 backgroundColor: darkMode ? '#374151' : 'white',
                 color: darkMode ? 'white' : 'inherit',
@@ -215,7 +209,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ onClose, darkMode }) => {
             }}
           />
           <IconButton 
-            color="primary" 
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
             aria-label="Send message"
