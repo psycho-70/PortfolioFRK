@@ -32,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         localStorage.removeItem("adminToken");
         router.push("/admin/login");
     };
+    // Define navigation items for the sidebar
 
     const navItems = [
         { id: "overview", label: "Overview", icon: LayoutDashboard, path: "/admin/dashboard" },
