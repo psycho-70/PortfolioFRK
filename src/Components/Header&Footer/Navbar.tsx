@@ -1,382 +1,280 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { IoMdMenu, IoMdClose } from "react-icons/io";
 import Image from "next/image";
 import Link from "next/link";
-import { Drawer, IconButton, Switch } from "@mui/material";
+import { usePathname } from "next/navigation";
+import { Switch } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useAppContext } from "@/Context/AppContext";
-// Type definitions
-interface NavItem {
-  name: string;
-  color: string;
-}
+// import NavScene from "./NavScene";
+import gsap from "gsap";
 
-interface AppContextType {
-  darkMode: boolean;
-  toggleDarkMode: () => void;
-}
+const NAV_ITEMS = [
+  { id: "home", label: "Home", num: "01", path: "/" },
+  { id: "skill", label: "Skill", num: "02", path: "/skill" },
+  { id: "project", label: "Project", num: "03", path: "/project" },
+  { id: "services", label: "Services", num: "04", path: "/services" },
+  { id: "team", label: "Team", num: "05", path: "/team" },
+  { id: "experience", label: "Experience", num: "06", path: "/experience" },
+  { id: "contact", label: "Contact", num: "07", path: "/contact" },
+];
 
-// Enhanced Material UI Switch for Dark Mode
-const MaterialUISwitch = styled(Switch)(({ theme }) => ({
-  width: 70,
-  height: 38,
-  padding: 7,
-  '& .MuiSwitch-switchBase': {
+const SOCIALS = [
+  { label: "GitHub", href: "https://github.com/psycho-70" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/furqan-ktk-856552191" },
+  { label: "Facebook", href: "https://web.facebook.com/furqan.don.771/" },
+];
+
+const MaterialUISwitch = styled(Switch)(() => ({
+  width: 56,
+  height: 30,
+  padding: 6,
+  "& .MuiSwitch-switchBase": {
     margin: 1,
     padding: 0,
-    transform: 'translateX(6px)',
-    '&.Mui-checked': {
-      color: '#fff',
-      transform: 'translateX(24px)',
-      '& .MuiSwitch-thumb:before': {
-        backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20"><path fill="${encodeURIComponent(
-          '#fff',
-        )}" d="M4.2 2.5l-.7 1.8-1.8.7 1.8.7.7 1.8.6-1.8L6.7 5l-1.9-.7-.6-1.8zm15 8.3a6.7 6.7 0 11-6.6-6.6 5.8 5.8 0 006.6 6.6z"/></svg>')`,
-      },
-      '& + .MuiSwitch-track': {
-        opacity: 1,
-        background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-      },
+    transform: "translateX(4px)",
+    "&.Mui-checked": {
+      color: "#fff",
+      transform: "translateX(20px)",
+      "& + .MuiSwitch-track": { opacity: 1, background: "linear-gradient(45deg,#667eea,#764ba2)" },
     },
   },
-  '& .MuiSwitch-thumb': {
-    background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-    width: 34,
-    height: 34,
-    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
-    '&::before': {
-      content: "''",
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      left: 0,
-      top: 0,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20"><path fill="${encodeURIComponent(
-        '#fff',
-      )}" d="M9.305 1.667V3.75h1.389V1.667h-1.39zm-4.707 1.95l-.982.982L5.09 6.072l.982-.982-1.473-1.473zm10.802 0L13.927 5.09l.982.982 1.473-1.473-.982-.982zM10 5.139a4.872 4.872 0 00-4.862 4.86A4.872 4.872 0 0010 14.862 4.872 4.872 0 0014.86 10 4.872 4.872 0 0010 5.139zm0 1.389A3.462 3.462 0 0113.471 10a3.462 3.462 0 01-3.473 3.472A3.462 3.462 0 016.527 10 3.462 3.462 0 0110 6.528zM1.665 9.305v1.39h2.083v-1.39H1.666zm14.583 0v1.39h2.084v-1.39h-2.084zM5.09 13.928L3.616 15.4l.982.982 1.473-1.473-.982-.982zm9.82 0l-.982.982 1.473 1.473.982-.982-1.473-1.473zM9.305 16.25v2.083h1.389V16.25h-1.39z"/></svg>')`,
-    },
+  "& .MuiSwitch-thumb": {
+    background: "linear-gradient(45deg,#667eea,#764ba2)",
+    width: 26,
+    height: 26,
+    boxShadow: "0 2px 8px rgba(102,126,234,0.4)",
   },
-  '& .MuiSwitch-track': {
-    opacity: 1,
-    background: 'linear-gradient(45deg, #ffeaa7 0%, #fab1a0 100%)',
-    borderRadius: 20 / 2,
-  },
+  "& .MuiSwitch-track": { opacity: 1, background: "linear-gradient(45deg,#ffeaa7,#fab1a0)", borderRadius: 20 },
 }));
 
 const Navbar: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
-  const [lastScrollY, setLastScrollY] = useState<number>(0);
-  const [activeItem, setActiveItem] = useState<string>("Home");
+  const { darkMode, toggleDarkMode } = useAppContext();
+  const pathname = usePathname();
 
-  const { darkMode, toggleDarkMode }: AppContextType = useAppContext();
+  const [open, setOpen] = useState(false);       // burger state
+  const [mounted, setMounted] = useState(false); // overlay is in the DOM
+  const [hovered, setHovered] = useState(-1);
+  const [visible, setVisible] = useState(true);
+  const [isLogged, setIsLogged] = useState(false);
 
-  const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
-    if (
-      event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Tab' ||
-        (event as React.KeyboardEvent).key === 'Shift')
-    ) {
-      return;
-    }
-    setIsMenuOpen(open);
-  };
-
-  const handleScroll = (): void => {
-    if (typeof window !== "undefined") {
-      const currentScrollY: number = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsNavbarVisible(false);
-      } else {
-        setIsNavbarVisible(true);
-      }
-      setLastScrollY(currentScrollY);
-    }
-  };
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const tl = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.addEventListener("scroll", handleScroll);
-      return () => {
-        window.removeEventListener("scroll", handleScroll);
-      };
+    try {
+      setIsLogged(!!localStorage.getItem("adminToken"));
+    } catch {
+      /* storage unavailable */
     }
-  }, [lastScrollY]);
+  }, []);
 
-  const navItems: NavItem[] = [
-    { name: "Home", color: "from-pink-500 to-rose-500" },
-    { name: "Skill", color: "from-blue-500 to-cyan-500" },
-    { name: "Project", color: "from-green-500 to-teal-500" },
-    { name: "Services", color: "from-yellow-500 to-orange-500" },
-    { name: "Team", color: "from-red-500 to-pink-500" },
-    { name: "Experience", color: "from-purple-500 to-indigo-500" },
-  ];
+  // hide on scroll down, show on scroll up
+  useEffect(() => {
+    let lastY = 0;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setVisible(y <= lastY || y < 60);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const handleNavItemClick = (itemName: string): void => {
-    setActiveItem(itemName);
-    setIsMenuOpen(false);
+  // GSAP: circular reveal from the burger, then masked line reveals
+  useEffect(() => {
+    if (!mounted || !overlayRef.current) return;
+    const ctx = gsap.context(() => {
+      tl.current = gsap
+        .timeline()
+        .fromTo(
+          overlayRef.current,
+          { clipPath: "circle(0% at calc(100% - 2.5rem) 2.5rem)" },
+          { clipPath: "circle(150% at calc(100% - 2.5rem) 2.5rem)", duration: 0.9, ease: "power3.inOut" }
+        )
+        .fromTo(".nav-line", { yPercent: 110 }, { yPercent: 0, duration: 0.7, stagger: 0.06, ease: "power4.out" }, "-=0.4")
+        .fromTo(".nav-fade", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" }, "-=0.5");
+    }, overlayRef);
+    return () => ctx.revert();
+  }, [mounted]);
+
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+    setHovered(-1);
+    if (tl.current) {
+      tl.current.eventCallback("onReverseComplete", () => setMounted(false));
+      tl.current.timeScale(1.8).reverse();
+    } else {
+      setMounted(false);
+    }
+  }, []);
+
+  const toggleMenu = () => {
+    if (!mounted) {
+      setMounted(true);
+      setOpen(true);
+    } else if (open) {
+      closeMenu();
+    }
   };
+
+  // lock page scroll + Escape to close while the overlay is up
+  useEffect(() => {
+    if (!mounted) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [mounted, closeMenu]);
+
+  const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname.startsWith(p));
+  const bar = darkMode ? "bg-white" : "bg-gray-900";
 
   return (
     <>
-      <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          isNavbarVisible ? "translate-y-0" : "-translate-y-full"
-        }`}
+      {/* ───────── Floating pill header ───────── */}
+      <motion.header
+        animate={{ y: visible || mounted ? 0 : -110, opacity: visible || mounted ? 1 : 0 }}
+        transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+        className="fixed left-0 right-0 top-4 z-[110] px-4"
       >
-        {/* Main Navbar */}
-        <div className={`relative ${
-          darkMode 
-            ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900' 
-            : 'bg-gradient-to-r from-white via-gray-50 to-white'
-        } backdrop-blur-md shadow-2xl border-b ${
-          darkMode ? 'border-gray-700/50' : 'border-gray-200/50'
-        }`}>
-          
-          {/* Animated Background Elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-0 left-0 w-full h-full">
-              <div className="absolute top-0 left-1/4 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-xl animate-pulse"></div>
-              <div className="absolute top-0 right-1/4 w-24 h-24 bg-gradient-to-br from-pink-500/10 to-orange-500/10 rounded-full blur-xl animate-pulse delay-1000"></div>
-            </div>
-          </div>
+        <div
+          className={`mx-auto flex h-16 max-w-[1500px] items-center justify-between rounded-full border px-4 pl-5 shadow-lg backdrop-blur-xl transition-colors duration-300
+            ${darkMode ? "border-white/10 bg-black/40 text-white shadow-black/30" : "border-black/10 bg-white/60 text-gray-900 shadow-purple-500/10"}`}
+        >
+          <Link href="/" aria-label="Home" className="relative shrink-0">
+            <Image
+              src={darkMode ? "/seclogo.png" : "/firstlogo.png"}
+              width={84}
+              height={40}
+              alt="FK Logo"
+              priority
+              className="transition-transform duration-300 hover:scale-105"
+            />
+          </Link>
 
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              
-              {/* Logo Section */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                className="relative z-10"
+          {/* inline links (wide screens) with a sliding active pill */}
+          {/* <nav className="hidden items-center gap-1 xl:flex" aria-label="Main">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.id}
+                href={item.path}
+                className={`relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  isActive(item.path) ? "text-white" : darkMode ? "text-white/60 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                }`}
               >
-                <Link href="#home" aria-label="Home">
-                  <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition-opacity duration-300"></div>
-                    <div className="relative p-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm">
-                      <Image
-                        src={darkMode ? '/seclogo.png' : '/firstlogo.png'}
-                        width={100}
-                        height={50}
-                        alt="Company Logo"
-                        className="transition-transform duration-300 group-hover:scale-105"
-                        priority
-                      />
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
+                {isActive(item.path) && (
+                  <motion.span
+                    layoutId="navPill"
+                    className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                {item.label}
+              </Link>
+            ))}
+          </nav> */}
 
-              {/* Desktop Navigation */}
-              <div className="hidden md:flex items-center space-x-8">
-                {navItems.map((item: NavItem, index: number) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="relative group"
+          <div className="flex items-center gap-3">
+            <Link
+              href={isLogged ? "/admin/dashboard" : "/admin/login"}
+              className={`hidden rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors sm:block ${
+                darkMode ? "border-white/10 bg-white/5 text-white/80 hover:bg-white/10" : "border-black/10 bg-black/5 text-gray-700 hover:bg-black/10"
+              }`}
+            >
+              {isLogged ? "Dashboard" : "Sign In"}
+            </Link>
+
+            <MaterialUISwitch checked={darkMode} onChange={toggleDarkMode} inputProps={{ "aria-label": "Toggle dark mode" }} />
+
+            <button
+              onClick={toggleMenu}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              className={`flex h-11 w-11 items-center justify-center rounded-full border transition-transform hover:scale-105 active:scale-95 ${
+                darkMode ? "border-white/20 bg-white/10" : "border-black/10 bg-black/5"
+              }`}
+            >
+              <span className="flex w-5 flex-col gap-1.5">
+                <motion.span animate={open ? { rotate: 45, y: 4 } : { rotate: 0, y: 0 }} className={`h-0.5 rounded-full ${bar}`} />
+                <motion.span animate={open ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }} className={`h-0.5 rounded-full ${bar}`} />
+              </span>
+            </button>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* ───────── Full-screen overlay ───────── */}
+      {mounted && (
+        <div
+          ref={overlayRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site navigation"
+          className={`fixed inset-0 z-[105] overflow-hidden ${darkMode ? "bg-[#07060d] text-white" : "bg-[#f6f3ff] text-gray-900"}`}
+        >
+          {/* <NavScene hovered={hovered} className="absolute inset-0" /> */}
+
+          <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-between px-6 pb-8 pt-28 md:px-10">
+            <nav className="flex flex-1 flex-col justify-center" aria-label="Overlay">
+              {NAV_ITEMS.map((item, i) => (
+                <div key={item.id} className="overflow-hidden">
+                  <Link
+                    href={item.path}
+                    onClick={closeMenu}
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(-1)}
+                    onFocus={() => setHovered(i)}
+                    onBlur={() => setHovered(-1)}
+                    className={`nav-line group flex items-baseline gap-5 py-1 transition-opacity duration-300 md:py-1.5 ${
+                      hovered !== -1 && hovered !== i ? "opacity-30" : "opacity-100"
+                    }`}
                   >
-                    <Link 
-                      href={`#${item.name.toLowerCase()}`}
-                      onClick={() => handleNavItemClick(item.name)}
-                      aria-label={`Navigate to ${item.name}`}
+                    <span className="w-8 font-mono text-xs tracking-widest text-purple-500">{item.num}</span>
+                    <span
+                      className={`text-4xl font-black tracking-tight transition-transform duration-300 group-hover:translate-x-3 sm:text-5xl md:text-6xl lg:text-7xl ${
+                        isActive(item.path) ? "bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent" : ""
+                      }`}
                     >
-                      <div className="relative px-4 py-2 rounded-full transition-all duration-300 group-hover:scale-105">
-                        {/* Background Gradient */}
-                        <div className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-0 group-hover:opacity-20 rounded-full transition-opacity duration-300`}></div>
-                        
-                        {/* Text */}
-                        <span className={`relative text-lg font-medium transition-all duration-300 ${
-                          activeItem === item.name 
-                            ? `bg-gradient-to-r ${item.color} bg-clip-text text-transparent` 
-                            : darkMode 
-                              ? 'text-gray-300 group-hover:text-white' 
-                              : 'text-gray-700 group-hover:text-gray-900'
-                        }`}>
-                          {item.name}
-                        </span>
+                      {item.label}
+                    </span>
+                  </Link>
+                </div>
+              ))}
+            </nav>
 
-                        {/* Animated Underline */}
-                        <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r ${item.color} transition-all duration-300 ${
-                          activeItem === item.name ? 'w-full' : 'w-0 group-hover:w-3/4'
-                        } rounded-full`}></div>
-
-                        {/* Hover Glow Effect */}
-                        <div className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-0 group-hover:opacity-10 rounded-full blur-lg transition-opacity duration-300`}></div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-
-                {/* Dark Mode Switch */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
-                  className="ml-4"
-                >
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur opacity-25"></div>
-                    <div className="relative">
-                      <MaterialUISwitch 
-                        checked={darkMode} 
-                        onChange={toggleDarkMode} 
-                        inputProps={{ 'aria-label': 'Toggle dark mode' }}
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-
-              {/* Mobile Menu Button */}
-              <div className="md:hidden">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur opacity-25"></div>
-                  <IconButton 
-                    onClick={toggleDrawer(true)}
-                    className={`relative ${
-                      darkMode ? 'text-white' : 'text-gray-700'
-                    } p-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-full`}
-                    aria-label="Open navigation menu"
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-current/10 pt-6">
+              <div className="nav-fade flex flex-wrap gap-3">
+                {SOCIALS.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+                      darkMode ? "border-white/15 text-white/70 hover:bg-white/10" : "border-black/10 text-gray-600 hover:bg-black/5"
+                    }`}
                   >
-                    <IoMdMenu size={28} />
-                  </IconButton>
-                </motion.div>
+                    {s.label}
+                  </a>
+                ))}
               </div>
+              <Link
+                href={isLogged ? "/admin/dashboard" : "/admin/login"}
+                onClick={closeMenu}
+                className="nav-fade rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 text-sm font-semibold text-white"
+              >
+                {isLogged ? "Dashboard" : "Admin login"}
+              </Link>
             </div>
           </div>
         </div>
-
-        {/* Mobile Drawer */}
-        <Drawer
-          anchor="right"
-          open={isMenuOpen}
-          onClose={toggleDrawer(false)}
-          PaperProps={{
-            style: {
-              width: "85%",
-              maxWidth: "400px",
-              background: darkMode 
-                ? 'linear-gradient(135deg, #1f2937 0%, #111827 100%)' 
-                : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-              backdropFilter: 'blur(20px)',
-            },
-          }}
-        >
-          <div className="relative h-full">
-            {/* Decorative Background */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-xl"></div>
-              <div className="absolute bottom-20 left-10 w-24 h-24 bg-gradient-to-br from-pink-500/10 to-orange-500/10 rounded-full blur-xl"></div>
-            </div>
-
-            <div className="relative z-10 p-6">
-              {/* Close Button */}
-              <div className="flex justify-end mb-8">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <IconButton 
-                    onClick={toggleDrawer(false)}
-                    className={`${
-                      darkMode ? 'text-white' : 'text-gray-700'
-                    } p-3 bg-gradient-to-r from-red-500/10 to-pink-500/10 backdrop-blur-sm rounded-full`}
-                    aria-label="Close navigation menu"
-                  >
-                    <IoMdClose size={28} />
-                  </IconButton>
-                </motion.div>
-              </div>
-
-              {/* Mobile Navigation Items */}
-              <div className="space-y-4">
-                {navItems.map((item: NavItem, index: number) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="relative group"
-                  >
-                    <Link 
-                      href={`#${item.name.toLowerCase()}`}
-                      onClick={() => handleNavItemClick(item.name)}
-                      aria-label={`Navigate to ${item.name}`}
-                    >
-                      <div className={`relative p-4 rounded-2xl transition-all duration-300 group-hover:scale-105 ${
-                        darkMode ? 'bg-gray-800/50' : 'bg-white/50'
-                      } backdrop-blur-sm border ${
-                        darkMode ? 'border-gray-700/50' : 'border-gray-200/50'
-                      }`}>
-                        {/* Background Gradient */}
-                        <div className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
-                        
-                        {/* Content */}
-                        <div className="relative flex items-center space-x-4">
-                          <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${item.color} ${
-                            activeItem === item.name ? 'opacity-100' : 'opacity-50'
-                          }`}></div>
-                          <span className={`text-xl font-medium transition-all duration-300 ${
-                            activeItem === item.name 
-                              ? `bg-gradient-to-r ${item.color} bg-clip-text text-transparent` 
-                              : darkMode 
-                                ? 'text-gray-300 group-hover:text-white' 
-                                : 'text-gray-700 group-hover:text-gray-900'
-                          }`}>
-                            {item.name}
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Dark Mode Switch for Mobile */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="mt-8 flex items-center justify-center"
-              >
-                <div className={`p-4 rounded-2xl ${
-                  darkMode ? 'bg-gray-800/50' : 'bg-white/50'
-                } backdrop-blur-sm border ${
-                  darkMode ? 'border-gray-700/50' : 'border-gray-200/50'
-                }`}>
-                  <div className="flex items-center space-x-4">
-                    <span className={`text-lg font-medium ${
-                      darkMode ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                      {darkMode ? 'Dark Mode' : 'Light Mode'}
-                    </span>
-                    <MaterialUISwitch 
-                      checked={darkMode} 
-                      onChange={toggleDarkMode} 
-                      inputProps={{ 'aria-label': 'Toggle dark mode' }}
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </Drawer>
-      </nav>
-
-      {/* Spacer for fixed navbar */}
-      <div className="h-20"></div>
+      )}
     </>
   );
 };

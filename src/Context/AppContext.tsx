@@ -40,6 +40,15 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     });
   };
 
+  // Sync `.dark` class on <html> so CSS theme selectors work
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
   return (
     <AppContext.Provider value={{ darkMode, toggleDarkMode }}>
       {children}

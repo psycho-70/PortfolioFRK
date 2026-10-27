@@ -1,252 +1,261 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useRef } from "react";
+import Link from "next/link";
 import { MdOutlineFacebook } from "react-icons/md";
-import { FaInstagram } from "react-icons/fa";
+import { FaInstagram, FaGithub, FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { useAppContext } from '@/Context/AppContext';
+import { ArrowUpRight, ArrowUp, Mail, Phone } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { useAppContext } from "@/Context/AppContext";
 
-// Type definitions
-interface SocialLink {
-    icon: React.ComponentType<{ className?: string }>;
-    href: string;
-    color: string;
-}
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-interface AppContextType {
-    darkMode: boolean;
-}
+/* ───────────── Edit your content here ───────────── */
+const brand = {
+    name: "Furqan Khattak",
+    tagline: "Creative web developer building fast, beautiful and intelligent web experiences.",
+    email: "furqanktk52@gmail.com",
+    phone: "+923141868872",
+};
+
+const navLinks = [
+    { label: "Home", href: "/" },
+    { label: "Skill", href: "/skill" },
+    { label: "Project", href: "/project" },
+    { label: "Services", href: "/services" },
+    { label: "Team", href: "/team" },
+    { label: "Experience", href: "/experience" },
+    { label: "Contact", href: "/contact" },
+];
+
+const socials = [
+    { label: "GitHub", href: "https://github.com/psycho-70", icon: FaGithub },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/furqan-ktk-856552191", icon: FaLinkedin },
+    { label: "Facebook", href: "https://web.facebook.com/furqan.don.771/", icon: MdOutlineFacebook },
+    { label: "Instagram", href: "https://www.instagram.com/furqankhan070/", icon: FaInstagram },
+    { label: "X", href: "https://twitter.com/?lang=en", icon: FaXTwitter },
+];
+/* ─────────────────────────────────────────────────── */
 
 const Footer: React.FC = () => {
-    const { darkMode }: AppContextType = useAppContext();
+    const { darkMode } = useAppContext();
+    const footerRef = useRef<HTMLElement>(null);
 
-    const socialLinks: SocialLink[] = [
-        { 
-            icon: MdOutlineFacebook, 
-            href: "https://web.facebook.com/furqan.don.771/", 
-            color: "from-blue-500 to-blue-600" 
-        },
-        { 
-            icon: FaXTwitter, 
-            href: "https://twitter.com/?lang=en", 
-            color: "from-gray-700 to-black" 
-        },
-        { 
-            icon: FaInstagram, 
-            href: "https://www.instagram.com/furqankhan070/", 
-            color: "from-pink-500 to-purple-600" 
+    useEffect(() => {
+        const el = footerRef.current;
+        if (!el) return;
+        const mm = gsap.matchMedia();
+
+        mm.add(
+            "(prefers-reduced-motion: no-preference)",
+            () => {
+                const trigger = { trigger: el, start: "top 75%" };
+
+                // top line draws across
+                gsap.fromTo(".f-line", { scaleX: 0 }, { scaleX: 1, duration: 1.4, ease: "power3.out", scrollTrigger: trigger });
+
+                // headline lines slide up from behind a mask
+                gsap.from(".cta-line", {
+                    yPercent: 115,
+                    duration: 1,
+                    stagger: 0.14,
+                    ease: "power4.out",
+                    scrollTrigger: trigger,
+                });
+
+                // email button + columns
+                gsap.from(".cta-mail", { opacity: 0, y: 30, duration: 0.8, delay: 0.35, ease: "power3.out", scrollTrigger: trigger });
+                gsap.from(".f-col", {
+                    opacity: 0,
+                    y: 40,
+                    duration: 0.8,
+                    stagger: 0.12,
+                    ease: "power3.out",
+                    scrollTrigger: { trigger: ".f-grid", start: "top 90%" },
+                });
+
+                // giant name rises into view as you reach the bottom
+                gsap.fromTo(
+                    ".f-giant",
+                    { yPercent: 70 },
+                    {
+                        yPercent: 0,
+                        ease: "none",
+                        scrollTrigger: { trigger: ".f-giant-wrap", start: "top bottom", end: "bottom bottom", scrub: true },
+                    }
+                );
+            },
+            el
+        );
+
+        // magnetic effect on the email button (pointer devices only)
+        const cleanups: Array<() => void> = [];
+        if (window.matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches) {
+            el.querySelectorAll<HTMLElement>(".magnet").forEach((m) => {
+                const xTo = gsap.quickTo(m, "x", { duration: 0.4, ease: "power3" });
+                const yTo = gsap.quickTo(m, "y", { duration: 0.4, ease: "power3" });
+                const move = (e: MouseEvent) => {
+                    const r = m.getBoundingClientRect();
+                    xTo((e.clientX - (r.left + r.width / 2)) * 0.25);
+                    yTo((e.clientY - (r.top + r.height / 2)) * 0.25);
+                };
+                const leave = () => {
+                    xTo(0);
+                    yTo(0);
+                };
+                m.addEventListener("mousemove", move);
+                m.addEventListener("mouseleave", leave);
+                cleanups.push(() => {
+                    m.removeEventListener("mousemove", move);
+                    m.removeEventListener("mouseleave", leave);
+                });
+            });
         }
-    ];
 
-    const generateFloatingShapes = (): React.ReactNode[] => {
-        return Array.from({ length: 8 }, (_, i) => (
-            <div
-                key={i}
-                className={`absolute opacity-30 animate-float ${
-                    darkMode ? 'bg-gradient-to-r from-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-400 to-purple-400'
-                }`}
-                // style={{
-                //     left: `${Math.random() * 100}%`,
-                //     top: `${Math.random() * 100}%`,
-                //     width: `${Math.random() * 20 + 10}px`,
-                //     height: `${Math.random() * 20 + 10}px`,
-                //     borderRadius: Math.random() > 0.5 ? '50%' : '0%',
-                //     animationDelay: `${Math.random() * 5}s`,
-                //     animationDuration: `${Math.random() * 10 + 15}s`
-                // }}
-            />
-        ));
+        return () => {
+            mm.revert();
+            cleanups.forEach((fn) => fn());
+        };
+    }, []);
+
+    const backToTop = () => {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        gsap.to(window, { scrollTo: 0, duration: reduce ? 0 : 1.2, ease: "power3.inOut" });
     };
 
+    const heading = darkMode ? "text-white" : "text-gray-900";
+    const muted = darkMode ? "text-gray-400" : "text-gray-600";
+    const linkHover = darkMode ? "hover:text-white" : "hover:text-purple-700";
+    const label = `mb-5 text-xs font-semibold uppercase tracking-widest ${darkMode ? "text-purple-300" : "text-purple-600"}`;
+
     return (
-        <footer className={`relative w-full overflow-hidden transition-all duration-700 ${
-            darkMode 
-                ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-black' 
-                : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'
-        }`}>
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className={`absolute -top-32 -left-32 w-64 h-64 rounded-full opacity-20 blur-3xl animate-pulse ${
-                    darkMode ? 'bg-purple-500' : 'bg-blue-400'
-                }`}></div>
-                <div className={`absolute -bottom-32 -right-32 w-80 h-80 rounded-full opacity-20 blur-3xl animate-pulse delay-1000 ${
-                    darkMode ? 'bg-pink-500' : 'bg-purple-400'
-                }`}></div>
-                <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full opacity-10 blur-3xl animate-pulse delay-2000 ${
-                    darkMode ? 'bg-blue-500' : 'bg-pink-400'
-                }`}></div>
+        <footer
+            ref={footerRef}
+            className={`relative w-full overflow-hidden transition-colors duration-500 ${
+                darkMode ? "bg-[#07050f] text-white" : "bg-[#f5f0ff] text-gray-900"
+            }`}
+        >
+            {/* background glows */}
+            <div aria-hidden className="pointer-events-none absolute inset-0">
+                <div className={`absolute -left-32 top-0 h-[480px] w-[480px] rounded-full blur-[140px] ${darkMode ? "bg-purple-600/25" : "bg-purple-400/30"}`} />
+                <div className={`absolute -right-32 bottom-20 h-[420px] w-[420px] rounded-full blur-[140px] ${darkMode ? "bg-pink-600/20" : "bg-pink-300/40"}`} />
             </div>
 
-            {/* Floating Geometric Shapes */}
-            <div className="absolute inset-0 pointer-events-none">
-                {generateFloatingShapes()}
-            </div>
+            <div className="f-line h-px w-full origin-left bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
 
-            {/* Glassmorphism Top Border */}
-            <div className={`h-[2px] w-full ${
-                darkMode 
-                    ? 'bg-gradient-to-r from-transparent via-purple-400 to-transparent' 
-                    : 'bg-gradient-to-r from-transparent via-blue-400 to-transparent'
-            }`}></div>
-
-            {/* Main Content */}
-            <div className="relative z-10 container mx-auto px-6 py-16">
-                {/* Top Section with Typing Effect */}
-                <div className="text-center mb-16">
-                    <div className={`text-4xl md:text-5xl font-bold mb-6 ${
-                        darkMode ? 'text-white' : 'text-gray-800'
-                    }`}>
-                        {/* <TypingEffect 
-                            text="" 
-                            speed={100}
-                            className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
-                        /> */}
-                        INFORMATION WORLD
-                    </div>
-                    <p className={`text-lg md:text-xl opacity-80 ${
-                        darkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`}>
-                        Connecting worlds through information
+            <div className="relative mx-auto max-w-[1300px] px-6 pt-24">
+                {/* CTA */}
+                <div className="mb-24">
+                    <p className={`mb-6 text-sm font-semibold uppercase tracking-widest ${darkMode ? "text-purple-300" : "text-purple-600"}`}>
+                        Have a project in mind?
                     </p>
+                    <h2 className={`text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl md:text-8xl ${heading}`}>
+                        <span className="block overflow-hidden pb-2">
+                            <span className="cta-line block">Let&apos;s build</span>
+                        </span>
+                        <span className="block overflow-hidden pb-2">
+                            <span className="cta-line block bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                                something great.
+                            </span>
+                        </span>
+                    </h2>
+
+                    <div className="cta-mail mt-10">
+                        <a
+                            href={`mailto:${brand.email}`}
+                            className="magnet group inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-7 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 md:text-lg"
+                        >
+                            {brand.email}
+                            <ArrowUpRight size={20} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                        </a>
+                    </div>
                 </div>
 
-                {/* Main Footer Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
-                    {/* Social Media Section */}
-                    <div className="text-center group">
-                        <div className={`inline-block p-4 rounded-full mb-6 transition-all duration-500 group-hover:scale-110 ${
-                            darkMode 
-                                ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-500/30' 
-                                : 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-500/30'
-                        }`}>
-                            <h3 className={`text-2xl font-bold ${
-                                darkMode ? 'text-white' : 'text-gray-800'
-                            }`}>
-                                Follow Us
-                            </h3>
-                        </div>
-                        <div className="flex items-center justify-center gap-6">
-                            {socialLinks.map((social: SocialLink, index: number) => (
-                                <a
-                                    key={index}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`p-4 rounded-full transition-all duration-500 transform hover:scale-125 hover:rotate-12 ${
-                                        darkMode 
-                                            ? 'bg-gradient-to-r from-white/10 to-white/20 backdrop-blur-sm border border-white/20 text-white hover:shadow-2xl hover:shadow-purple-500/50' 
-                                            : 'bg-gradient-to-r from-white/70 to-white/90 backdrop-blur-sm border border-gray-200 text-gray-700 hover:shadow-2xl hover:shadow-blue-500/30'
-                                    }`}
-                                    aria-label={`Follow us on ${social.icon.name}`}
-                                >
-                                    <social.icon className="text-2xl" />
-                                </a>
+                {/* Link grid */}
+                <div className={`f-grid grid gap-12 border-t pt-14 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] ${darkMode ? "border-white/10" : "border-purple-900/10"}`}>
+                    <div className="f-col max-w-sm">
+                        <div className={`text-2xl font-black ${heading}`}>{brand.name}</div>
+                        <p className={`mt-3 leading-relaxed ${muted}`}>{brand.tagline}</p>
+                    </div>
+
+                    <div className="f-col">
+                        <h3 className={label}>Navigate</h3>
+                        <ul className="space-y-3">
+                            {navLinks.map((l) => (
+                                <li key={l.href}>
+                                    <Link href={l.href} className={`inline-block transition-transform duration-300 hover:translate-x-1 ${muted} ${linkHover}`}>
+                                        {l.label}
+                                    </Link>
+                                </li>
                             ))}
-                        </div>
+                        </ul>
                     </div>
 
-                    {/* Contact Section */}
-                    <div className="text-center group">
-                        <div className={`inline-block p-4 rounded-full mb-6 transition-all duration-500 group-hover:scale-110 ${
-                            darkMode 
-                                ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-500/30' 
-                                : 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-500/30'
-                        }`}>
-                            <h3 className={`text-2xl font-bold ${
-                                darkMode ? 'text-white' : 'text-gray-800'
-                            }`}>
-                                Contact Us
-                            </h3>
-                        </div>
-                        <div className="space-y-4">
-                            <div className={`p-4 rounded-xl backdrop-blur-sm border transition-all duration-300 hover:scale-105 ${
-                                darkMode 
-                                    ? 'bg-white/10 border-white/20 text-gray-300 hover:bg-white/20' 
-                                    : 'bg-white/50 border-gray-200 text-gray-700 hover:bg-white/70'
-                            }`}>
-                                <p className="font-medium">📧 furqanktk52@gmail.com</p>
-                            </div>
-                            <div className={`p-4 rounded-xl backdrop-blur-sm border transition-all duration-300 hover:scale-105 ${
-                                darkMode 
-                                    ? 'bg-white/10 border-white/20 text-gray-300 hover:bg-white/20' 
-                                    : 'bg-white/50 border-gray-200 text-gray-700 hover:bg-white/70'
-                            }`}>
-                                <p className="font-medium">📱 +923141868872</p>
-                            </div>
-                        </div>
+                    <div className="f-col">
+                        <h3 className={label}>Social</h3>
+                        <ul className="space-y-3">
+                            {socials.map(({ label: name, href, icon: Icon }) => (
+                                <li key={name}>
+                                    <a
+                                        href={href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`inline-flex items-center gap-3 transition-transform duration-300 hover:translate-x-1 ${muted} ${linkHover}`}
+                                    >
+                                        <Icon size={18} className="text-purple-500" />
+                                        {name}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
 
-                    {/* Copyright Section */}
-                    <div className="text-center group">
-                        <div className={`inline-block p-4 rounded-full mb-6 transition-all duration-500 group-hover:scale-110 ${
-                            darkMode 
-                                ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-sm border border-pink-500/30' 
-                                : 'bg-gradient-to-r from-blue-500/20 to-pink-500/20 backdrop-blur-sm border border-blue-500/30'
-                        }`}>
-                            <h3 className={`text-2xl font-bold ${
-                                darkMode ? 'text-white' : 'text-gray-800'
-                            }`}>
-                                Legacy
-                            </h3>
-                        </div>
-                        <div className={`p-6 rounded-xl backdrop-blur-sm border transition-all duration-500 hover:scale-105 ${
-                            darkMode 
-                                ? 'bg-gradient-to-r from-white/10 to-white/20 border-white/20 text-gray-300' 
-                                : 'bg-gradient-to-r from-white/50 to-white/70 border-gray-200 text-gray-700'
-                        }`}>
-                            <p className="text-lg font-medium">
-                                &copy; 2024 INFORMATION WORLD
-                            </p>
-                            <p className="mt-2 opacity-80">
-                                All rights reserved
-                            </p>
-                            <div className="mt-4 flex justify-center">
-                                <div className={`w-16 h-1 rounded-full ${
-                                    darkMode 
-                                        ? 'bg-gradient-to-r from-purple-400 to-pink-400' 
-                                        : 'bg-gradient-to-r from-blue-400 to-purple-400'
-                                }`}></div>
-                            </div>
-                        </div>
+                    <div className="f-col">
+                        <h3 className={label}>Contact</h3>
+                        <ul className="space-y-3">
+                            <li>
+                                <a href={`mailto:${brand.email}`} className={`inline-flex items-center gap-3 break-all transition-colors ${muted} ${linkHover}`}>
+                                    <Mail size={18} className="shrink-0 text-purple-500" />
+                                    {brand.email}
+                                </a>
+                            </li>
+                            <li>
+                                <a href={`tel:${brand.phone}`} className={`inline-flex items-center gap-3 transition-colors ${muted} ${linkHover}`}>
+                                    <Phone size={18} className="shrink-0 text-purple-500" />
+                                    {brand.phone}
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
-                {/* Bottom Wave Animation */}
-                <div className="relative">
-                    <div className={`h-32 w-full rounded-t-[100%] ${
-                        darkMode 
-                            ? 'bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20' 
-                            : 'bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20'
-                    }`}>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className={`text-sm opacity-70 ${
-                                darkMode ? 'text-white' : 'text-gray-700'
-                            }`}>
-                                Made with ❤️ for the digital world
-                            </div>
-                        </div>
-                    </div>
+                {/* Bottom bar */}
+                <div className={`mt-14 flex flex-wrap items-center justify-between gap-4 border-t py-6 text-sm ${muted} ${darkMode ? "border-white/10" : "border-purple-900/10"}`}>
+                    <p>
+                        &copy; {new Date().getFullYear()} {brand.name}. All rights reserved.
+                    </p>
+                    <button
+                        onClick={backToTop}
+                        aria-label="Back to top"
+                        className={`group flex items-center gap-2 rounded-full border px-4 py-2 transition-colors ${
+                            darkMode ? "border-white/15 hover:bg-white/10" : "border-purple-900/15 hover:bg-purple-900/5"
+                        }`}
+                    >
+                        Back to top
+                        <ArrowUp size={16} className="transition-transform duration-300 group-hover:-translate-y-1" />
+                    </button>
                 </div>
             </div>
 
-            {/* Custom Animations */}
-            <style jsx>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px) rotate(0deg); }
-                    25% { transform: translateY(-20px) rotate(90deg); }
-                    50% { transform: translateY(-10px) rotate(180deg); }
-                    75% { transform: translateY(-30px) rotate(270deg); }
-                }
-                
-                .animate-float {
-                    animation: float linear infinite;
-                }
-                
-                @keyframes pulse {
-                    0%, 100% { opacity: 0.2; }
-                    50% { opacity: 0.4; }
-                }
-            `}</style>
+            {/* Giant name that rises as you reach the bottom */}
+            {/* <div aria-hidden className="f-giant-wrap relative overflow-hidden">
+                <div className="f-giant select-none whitespace-nowrap bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 bg-clip-text pb-[0.08em] text-center text-[11vw] font-black uppercase leading-[0.9] tracking-tight text-transparent opacity-80">
+                    {brand.name}
+                </div>
+            </div> */}
         </footer>
     );
 };
