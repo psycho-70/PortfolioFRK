@@ -221,8 +221,10 @@ const SkillsShowcase = () => {
         const grouped = groupSkills(data);
         if (grouped.length > 0) setCategories(grouped);
         setError(null);
-      } catch (e: any) {
-        if (!cancelled) setError(e.message || 'Failed to load skills');
+      } catch (e: unknown) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : 'Failed to load skills');
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
