@@ -11,7 +11,6 @@ import {
     ExternalLink,
     AlertCircle
 } from "lucide-react";
-import { API_BASE_URL as API_URL } from "@/lib/api";
 
 interface ContactMessage {
     id: string;
@@ -29,6 +28,8 @@ export default function MessagePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [error, setError] = useState<string | null>(null);
+
+    const API_URL = process.env.NEXT_PUBLIC_DEPLOYMENT_URL
 
     const fetchMessages = async () => {
         setIsLoading(true);

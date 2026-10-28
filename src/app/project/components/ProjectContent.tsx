@@ -15,7 +15,6 @@ import {
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAppContext } from '@/Context/AppContext';
-import { API_BASE_URL as API_URL } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -35,6 +34,7 @@ interface Project {
   to: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_DEPLOYMENT_URL
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072';
 
 // Brand accent pairs, assigned to projects in order

@@ -9,7 +9,8 @@ import {
   Pencil,
   Loader2,
 } from 'lucide-react';
-import { API_BASE_URL as API_URL } from '@/lib/api';
+
+const API_URL = process.env.NEXT_PUBLIC_DEPLOYMENT_URL
 
 const ICON_OPTIONS = ['Code', 'GraduationCap', 'Briefcase', 'Building2', 'Rocket'] as const;
 

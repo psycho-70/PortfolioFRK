@@ -4,7 +4,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAppContext } from '@/Context/AppContext';
 import TypingEffect from '@/Components/UI/TypingEffect';
-import { API_BASE_URL as API_URL } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -36,6 +35,8 @@ const nameTexts: string[] = [
   'AI Automation Builder',
   'React & Next.js Expert',
 ];
+
+const API_URL = process.env.NEXT_PUBLIC_DEPLOYMENT_URL
 
 const CATEGORY_META: Record<string, { description: string; icon: string; from: string; to: string }> = {
   Frontend:               { description: 'Fast, responsive interfaces with clean, animated UIs.', icon: '🌐', from: '#3b82f6', to: '#06b6d4' },

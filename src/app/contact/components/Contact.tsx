@@ -4,19 +4,14 @@ import { Mail, Phone, MapPin, Send, Github, Linkedin, Clock, Loader2 } from 'luc
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAppContext } from '@/Context/AppContext';
-import { API_BASE_URL as API_URL, isLocalApiUrl } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /* ───────────── Edit your details here ───────────── */
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 // Where the form is sent (POST, JSON: { name, email, subject, message }).
 // Point this to your own backend route, or a service such as Formspree.
-const configuredContactEndpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT?.trim();
-const CONTACT_ENDPOINT =
-  configuredContactEndpoint &&
-  !(process.env.NODE_ENV === 'production' && isLocalApiUrl(configuredContactEndpoint))
-    ? configuredContactEndpoint
-    : `${API_URL}/api/contacts`;
+const CONTACT_ENDPOINT = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT || `${API_URL}/api/contacts`;
 
 const contact = {
   email: 'furqankhan.webdev@gmail.com',
