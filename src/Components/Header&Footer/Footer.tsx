@@ -13,7 +13,6 @@ import { useAppContext } from "@/Context/AppContext";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-/* ───────────── Edit your content here ───────────── */
 const brand = {
     name: "Furqan Khattak",
     tagline: "Creative web developer building fast, beautiful and intelligent web experiences.",
