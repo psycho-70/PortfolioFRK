@@ -14,6 +14,7 @@ import {
     X,
     UploadCloud
 } from "lucide-react";
+import { API_BASE_URL as API_URL } from "@/lib/api";
 
 interface TeamMember {
     id?: string;
@@ -47,8 +48,6 @@ export default function TeamPage() {
         experience: "1+ years",
         image: ""
     });
-
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
     const fetchTeam = async () => {
         setIsLoading(true);

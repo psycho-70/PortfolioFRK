@@ -16,10 +16,9 @@ import {
     type LucideIcon,
 } from "lucide-react";
 import gsap from "gsap";
+import { API_BASE_URL as API_URL } from "@/lib/api";
 
 /* ───────────── Edit these to match your admin routes ───────────── */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
 const QUICK_ACTIONS: { icon: LucideIcon; label: string; href: string; from: string; to: string; external?: boolean }[] = [
     { icon: Plus, label: "New Project", href: "/admin/dashboard/projects", from: "#a855f7", to: "#ec4899" },
     { icon: Users, label: "Manage Team", href: "/admin/dashboard/team", from: "#8b5cf6", to: "#6366f1" },

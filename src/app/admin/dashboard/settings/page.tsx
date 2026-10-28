@@ -1,12 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Settings, Shield, Key, Globe, CheckCircle2, User } from "lucide-react";
+import { API_BASE_URL as API_URL } from "@/lib/api";
 
 export default function SettingsPage() {
     const [saved, setSaved] = useState(false);
     const [adminInfo, setAdminInfo] = useState({ username: "adminfrk@gmail.com", role: "Super Admin" });
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
     return (
         <div className="space-y-8 max-w-4xl">
             <div>

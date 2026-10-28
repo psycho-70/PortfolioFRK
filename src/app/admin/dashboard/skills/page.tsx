@@ -1,8 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { Code2, Plus, Trash2, RefreshCw, X } from "lucide-react";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API_BASE_URL as API_URL } from "@/lib/api";
 
 interface Skill {
   id?: string;

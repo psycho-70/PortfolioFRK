@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAppContext } from '@/Context/AppContext';
 import { v4 as uuidv4 } from 'uuid';
+import { API_BASE_URL as API_URL } from '@/lib/api';
 
 // Type definitions
 interface Comment {
@@ -64,9 +65,6 @@ const Comments: React.FC = () => {
     }
     return uuidv4();
   });
-
-  const API_URL: string = process.env.NEXT_PUBLIC_DEPLOYMENT_URL || 'https://backendproject-01.vercel.app';
-  console.log('API_URL:', process.env.NEXT_PUBLIC_DEPLOYMENT_URL);
 
   const fetchComments = async (): Promise<void> => {
     try {

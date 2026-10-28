@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Lock, User, ShieldCheck, ArrowRight } from "lucide-react";
+import { API_BASE_URL as API_URL } from "@/lib/api";
 
 export default function AdminLogin() {
     const [username, setUsername] = useState("");
@@ -10,8 +11,6 @@ export default function AdminLogin() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
-
-    const API_URL = "http://localhost:5000";
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -8,6 +8,7 @@ import {
     Globe,
     Code2
 } from "lucide-react";
+import { API_BASE_URL as API_URL } from "@/lib/api";
 
 export default function ProjectPage() {
     const [projects, setProjects] = useState<any[]>([]);
@@ -24,8 +25,6 @@ export default function ProjectPage() {
         technologies: ""
     });
     const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
     const fetchProjects = async () => {
         setIsLoading(true);

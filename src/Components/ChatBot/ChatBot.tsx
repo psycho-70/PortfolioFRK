@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { Send, Close, SmartToy } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE_URL as API_URL } from '@/lib/api';
 
 interface Message {
   text: string;
@@ -23,7 +24,6 @@ interface ChatbotProps {
 }
 
 const Chatbot: React.FC<ChatbotProps> = ({ onClose, darkMode = false }) => {
-    const API_URL: string =  'http://localhost:5000';
   const [messages, setMessages] = useState<Message[]>([
     { 
       text: "Hello! I'm your AI portfolio assistant. Ask me about my skills, projects, or experience!", 
@@ -54,7 +54,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ onClose, darkMode = false }) => {
   setIsLoading(true);
   
   try {
-    const response = await fetch('https://backendproject-01.vercel.app/api/chat', {
+    const response = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
