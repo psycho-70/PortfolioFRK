@@ -9,10 +9,53 @@ import {
     Code2
 } from "lucide-react";
 
+// Vercel rejects request bodies larger than ~4.5MB, so keep the total image size under this.
+const MAX_TOTAL_BYTES = 4 * 1024 * 1024;
+
+// Shrinks large photos in the browser (max 1600px, JPEG) so uploads stay under the limit.
+const compressImage = (file: File, maxSize = 1600, quality = 0.8): Promise<File> =>
+    new Promise((resolve) => {
+        if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") {
+            return resolve(file);
+        }
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return resolve(file);
+            ctx.fillStyle = "#ffffff"; // avoids black backgrounds for transparent PNGs
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob || blob.size >= file.size) return resolve(file);
+                    const name = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+                    resolve(new File([blob], name, { type: "image/jpeg" }));
+                },
+                "image/jpeg",
+                quality
+            );
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve(file);
+        };
+        img.src = url;
+    });
+
+const formatMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(2);
+
 export default function ProjectPage() {
     const [projects, setProjects] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [formError, setFormError] = useState("");
     const [currentProject, setCurrentProject] = useState<any>(null);
     const [formData, setFormData] = useState({
         title: "",
@@ -23,9 +66,14 @@ export default function ProjectPage() {
         category: "",
         technologies: ""
     });
-    const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-    const API_URL = process.env.NEXT_PUBLIC_DEPLOYMENT_URL
+    // const API_URL = (process.env.NEXT_PUBLIC_DEPLOYMENT_URL || "").replace(/\/$/, "");
+    const API_URL = (process.env.NEXT_PUBLIC_DEPLOYMENT_URL || "").replace(/\/$/, "");
+
+    // New uploads are full Cloudinary URLs; older records only stored a filename.
+    const getImageSrc = (img: string) =>
+        img.startsWith("http") ? img : `${API_URL}/uploads/${img}`;
 
     const fetchProjects = async () => {
         setIsLoading(true);
@@ -59,11 +107,14 @@ export default function ProjectPage() {
 
     const resetForm = () => {
         setFormData({ title: "", description: "", longDescription: "", link: "", github: "", category: "", technologies: "" });
-        setSelectedFiles(null);
+        setSelectedFiles([]);
         setCurrentProject(null);
+        setFormError("");
     };
 
     const handleOpenModal = (project: any = null) => {
+        setFormError("");
+        setSelectedFiles([]);
         if (project) {
             setCurrentProject(project);
             setFormData({
@@ -81,14 +132,35 @@ export default function ProjectPage() {
         setIsModalOpen(true);
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setSelectedFiles(e.target.files);
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files ? Array.from(e.target.files) : [];
+        if (files.length === 0) {
+            setSelectedFiles([]);
+            return;
         }
+        setFormError("");
+        const compressed = await Promise.all(files.map((f) => compressImage(f)));
+        const total = compressed.reduce((sum, f) => sum + f.size, 0);
+        if (total > MAX_TOTAL_BYTES) {
+            setFormError(
+                `Selected images total ${formatMB(total)} MB. Please keep the total under ${formatMB(MAX_TOTAL_BYTES)} MB (choose fewer or smaller images).`
+            );
+        }
+        setSelectedFiles(compressed);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isSaving) return;
+
+        const totalSize = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+        if (totalSize > MAX_TOTAL_BYTES) {
+            setFormError(
+                `Images total ${formatMB(totalSize)} MB. Please keep the total under ${formatMB(MAX_TOTAL_BYTES)} MB.`
+            );
+            return;
+        }
+
         const token = localStorage.getItem("adminToken");
 
         const data = new FormData();
@@ -101,35 +173,35 @@ export default function ProjectPage() {
             }
         });
 
-        if (selectedFiles) {
-            for (let i = 0; i < selectedFiles.length; i++) {
-                data.append("images", selectedFiles[i]);
-            }
-        }
+        selectedFiles.forEach((file) => data.append("images", file));
 
+        setIsSaving(true);
+        setFormError("");
         try {
-            let res;
-            if (currentProject) {
-                res = await fetch(`${API_URL}/api/admin/projects/${currentProject.id}`, {
-                    method: "PATCH",
-                    headers: { "Authorization": `Bearer ${token}` },
-                    body: data
-                });
-            } else {
-                res = await fetch(`${API_URL}/api/admin/projects`, {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${token}` },
-                    body: data
-                });
-            }
+            const url = currentProject
+                ? `${API_URL}/api/admin/projects/${currentProject.id}`
+                : `${API_URL}/api/admin/projects`;
+
+            // Don't set Content-Type: the browser adds the multipart boundary automatically.
+            const res = await fetch(url, {
+                method: currentProject ? "PATCH" : "POST",
+                headers: { "Authorization": `Bearer ${token}` },
+                body: data
+            });
 
             if (res.ok) {
                 setIsModalOpen(false);
-                fetchProjects();
                 resetForm();
+                fetchProjects();
+            } else {
+                const err = await res.json().catch(() => null);
+                setFormError(err?.error || `Request failed (${res.status})`);
             }
         } catch (error) {
             console.error("Error saving project", error);
+            setFormError("Could not reach the server. Check your connection and try again.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -147,6 +219,8 @@ export default function ProjectPage() {
             console.error("Error deleting project", error);
         }
     };
+
+    const selectedTotal = selectedFiles.reduce((sum, f) => sum + f.size, 0);
 
     return (
         <div className="bg-[#111114] border border-white/5 rounded-3xl p-8 relative">
@@ -183,7 +257,7 @@ export default function ProjectPage() {
                                         <div className="flex items-center gap-3">
                                             {project.images && project.images.length > 0 ? (
                                                 <img
-                                                    src={`${API_URL}/uploads/${project.images[0]}`}
+                                                    src={getImageSrc(project.images[0])}
                                                     alt={project.title}
                                                     className="w-12 h-8 rounded-lg object-cover bg-gray-800"
                                                 />
@@ -199,8 +273,8 @@ export default function ProjectPage() {
                                     <td className="py-5 text-sm">{project.category || "Uncategorized"}</td>
                                     <td className="py-5">
                                         <div className="flex gap-2">
-                                            {project.link && <a href={project.link} target="_blank" className="p-1 hover:text-purple-400"><Globe size={14} /></a>}
-                                            {project.github && <a href={project.github} target="_blank" className="p-1 hover:text-purple-400"><Code2 size={14} /></a>}
+                                            {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="p-1 hover:text-purple-400"><Globe size={14} /></a>}
+                                            {project.github && <a href={project.github} target="_blank" rel="noreferrer" className="p-1 hover:text-purple-400"><Code2 size={14} /></a>}
                                         </div>
                                     </td>
                                     <td className="py-5 text-right">
@@ -237,7 +311,11 @@ export default function ProjectPage() {
                         <h3 className="text-2xl font-bold text-white mb-6">
                             {currentProject ? "Edit Project" : "Add New Project"}
                         </h3>
-                        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                        <form
+                            id="project-form"
+                            onSubmit={handleSubmit}
+                            className="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar"
+                        >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-xs text-gray-500 block mb-1">Project Title</label>
@@ -316,12 +394,27 @@ export default function ProjectPage() {
                                 <label className="text-xs text-gray-500 block mb-1">Upload Multiple Images</label>
                                 <input
                                     type="file"
+                                    accept="image/*"
                                     multiple
                                     onChange={handleFileChange}
                                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-600/10 file:text-purple-400 hover:file:bg-purple-600/20"
                                 />
-                                <p className="text-[10px] text-gray-600 mt-1">First image will be the primary thumbnail.</p>
+                                <p className="text-[10px] text-gray-600 mt-1">
+                                    First image will be the primary thumbnail. Images are resized automatically; total must stay under {formatMB(MAX_TOTAL_BYTES)} MB.
+                                    {currentProject && " Uploading new images replaces the existing ones."}
+                                </p>
+                                {selectedFiles.length > 0 && (
+                                    <p className="text-[11px] text-gray-400 mt-1">
+                                        {selectedFiles.length} image{selectedFiles.length > 1 ? "s" : ""} selected ({formatMB(selectedTotal)} MB)
+                                    </p>
+                                )}
                             </div>
+
+                            {formError && (
+                                <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                                    {formError}
+                                </div>
+                            )}
                         </form>
                         <div className="flex gap-3 pt-6 border-t border-white/5 mt-4">
                             <button
@@ -332,10 +425,12 @@ export default function ProjectPage() {
                                 Cancel
                             </button>
                             <button
-                                onClick={(e: any) => handleSubmit(e)}
-                                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-lg shadow-purple-600/20"
+                                type="submit"
+                                form="project-form"
+                                disabled={isSaving}
+                                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-lg shadow-purple-600/20 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
-                                {currentProject ? "Update Segment" : "Create Segment"}
+                                {isSaving ? "Saving..." : currentProject ? "Update Segment" : "Create Segment"}
                             </button>
                         </div>
                     </motion.div>
