@@ -234,7 +234,7 @@ export default function DashboardOverview() {
             to: online === false ? "#fb7185" : "#f97316",
             badge: latency !== null ? `${latency} ms` : "—",
             text: online === null ? "—" : online ? "Online" : "Offline",
-            textColor: online === false ? "text-rose-400" : "text-white",
+            textColor: online === false ? "text-rose-600 dark:text-rose-400" : "text-[var(--admin-text)]",
         },
     ];
 
@@ -250,14 +250,14 @@ export default function DashboardOverview() {
         <div ref={rootRef} className="space-y-8">
             {/* ---------- Header row ---------- */}
             <div className="db-head flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-[var(--admin-muted)]">
                     {updatedAt ? `Last updated ${updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Loading your data..."}
                 </p>
                 <button
                     type="button"
                     onClick={() => load()}
                     disabled={refreshing}
-                    className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-medium text-gray-300 transition-all hover:border-purple-500/40 hover:text-white disabled:opacity-60"
+                    className="flex items-center gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-soft-3)] px-4 py-2 text-sm font-medium text-[var(--admin-body)] transition-all hover:border-purple-500/40 hover:text-[var(--admin-text)] disabled:opacity-60"
                 >
                     <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
                     Refresh
@@ -266,7 +266,7 @@ export default function DashboardOverview() {
 
             {/* ---------- Error banner ---------- */}
             {error && (
-                <div role="alert" className="flex items-start gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">
+                <div role="alert" className="flex items-start gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-700 dark:text-rose-300">
                     <AlertTriangle size={18} className="mt-0.5 shrink-0" />
                     <span>{error}</span>
                 </div>
@@ -276,13 +276,13 @@ export default function DashboardOverview() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 {loading
                     ? [0, 1, 2, 3, 4].map((i) => (
-                          <div key={i} className="animate-pulse rounded-2xl border border-white/5 bg-[#111114] p-6">
+                          <div key={i} className="animate-pulse rounded-2xl border border-[var(--admin-border-soft)] bg-[var(--admin-panel)] p-6">
                               <div className="mb-4 flex items-center justify-between">
-                                  <div className="h-12 w-12 rounded-xl bg-white/5" />
-                                  <div className="h-5 w-14 rounded-full bg-white/5" />
+                                  <div className="h-12 w-12 rounded-xl bg-[var(--admin-soft)]" />
+                                  <div className="h-5 w-14 rounded-full bg-[var(--admin-soft)]" />
                               </div>
-                              <div className="h-4 w-24 rounded bg-white/5" />
-                              <div className="mt-3 h-7 w-16 rounded bg-white/5" />
+                              <div className="h-4 w-24 rounded bg-[var(--admin-soft)]" />
+                              <div className="mt-3 h-7 w-16 rounded bg-[var(--admin-soft)]" />
                           </div>
                       ))
                     : cards.map((c) => (
@@ -290,7 +290,7 @@ export default function DashboardOverview() {
                               key={c.label}
                               onMouseEnter={cardEnter}
                               onMouseLeave={cardLeave}
-                              className="db-card group relative overflow-hidden rounded-2xl border border-white/5 bg-[#111114] p-6 transition-colors duration-300 hover:border-purple-500/30"
+                              className="db-card group relative overflow-hidden rounded-2xl border border-[var(--admin-border-soft)] bg-[var(--admin-panel)] p-6 transition-colors duration-300 hover:border-purple-500/30"
                           >
                               {/* soft tint in the corner */}
                               <div
@@ -305,10 +305,10 @@ export default function DashboardOverview() {
                                   >
                                       <c.icon size={24} />
                                   </div>
-                                  <span className="rounded-full bg-purple-500/10 px-2 py-1 text-xs font-medium text-purple-400">{c.badge}</span>
+                                  <span className="rounded-full bg-purple-500/10 px-2 py-1 text-xs font-medium text-purple-600 dark:text-purple-400">{c.badge}</span>
                               </div>
-                              <p className="relative text-sm text-gray-500">{c.label}</p>
-                              <h3 className={`relative mt-1 text-3xl font-bold tabular-nums ${c.textColor ?? "text-white"}`}>
+                              <p className="relative text-sm text-[var(--admin-muted)]">{c.label}</p>
+                              <h3 className={`relative mt-1 text-3xl font-bold tabular-nums ${c.textColor ?? "text-[var(--admin-text)]"}`}>
                                   {c.value !== undefined ? (
                                       <span className="db-num" data-target={c.value} data-shown="0">
                                           0
@@ -323,32 +323,32 @@ export default function DashboardOverview() {
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* ---------- Content overview (real numbers from the API) ---------- */}
-                <div className="db-chart rounded-3xl border border-white/5 bg-[#111114] p-8 lg:col-span-2">
+                <div className="db-chart rounded-3xl border border-[var(--admin-border-soft)] bg-[var(--admin-panel)] p-8 lg:col-span-2">
                     <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
-                        <h3 className="text-xl font-bold text-white">Content Overview</h3>
-                        <p className="text-xs text-gray-500">Live data from your database</p>
+                        <h3 className="text-xl font-bold text-[var(--admin-text)]">Content Overview</h3>
+                        <p className="text-xs text-[var(--admin-muted)]">Live data from your database</p>
                     </div>
 
                     {loading ? (
                         <div className="space-y-6">
                             {[0, 1, 2].map((i) => (
                                 <div key={i} className="animate-pulse space-y-2">
-                                    <div className="h-4 w-24 rounded bg-white/5" />
-                                    <div className="h-4 w-full rounded-full bg-white/5" />
+                                    <div className="h-4 w-24 rounded bg-[var(--admin-soft)]" />
+                                    <div className="h-4 w-full rounded-full bg-[var(--admin-soft)]" />
                                 </div>
                             ))}
                         </div>
                     ) : !hasData ? (
-                        <p className="py-16 text-center text-sm text-gray-500">No content yet. Add your first project to see it here.</p>
+                        <p className="py-16 text-center text-sm text-[var(--admin-muted)]">No content yet. Add your first project to see it here.</p>
                     ) : (
                         <div className="space-y-7">
                             {bars.map((b) => (
                                 <div key={b.label}>
                                     <div className="mb-2 flex items-center justify-between text-sm">
-                                        <span className="font-medium text-gray-300">{b.label}</span>
-                                        <span className="font-bold tabular-nums text-white">{b.value}</span>
+                                        <span className="font-medium text-[var(--admin-body)]">{b.label}</span>
+                                        <span className="font-bold tabular-nums text-[var(--admin-text)]">{b.value}</span>
                                     </div>
-                                    <div className="h-4 w-full overflow-hidden rounded-full bg-white/5">
+                                    <div className="h-4 w-full overflow-hidden rounded-full bg-[var(--admin-soft)]">
                                         <div
                                             className="db-bar h-full w-0 rounded-full"
                                             data-value={b.value}
@@ -362,8 +362,8 @@ export default function DashboardOverview() {
                 </div>
 
                 {/* ---------- Quick actions ---------- */}
-                <div className="db-actions rounded-3xl border border-white/5 bg-[#111114] p-8">
-                    <h3 className="mb-8 text-xl font-bold text-white">Quick Actions</h3>
+                <div className="db-actions rounded-3xl border border-[var(--admin-border-soft)] bg-[var(--admin-panel)] p-8">
+                    <h3 className="mb-8 text-xl font-bold text-[var(--admin-text)]">Quick Actions</h3>
                     <div className="grid grid-cols-1 gap-4">
                         {QUICK_ACTIONS.map(({ icon: Icon, label, href, from, to, external }) => (
                             <Link
@@ -372,7 +372,7 @@ export default function DashboardOverview() {
                                 {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                                 onMouseEnter={actionEnter}
                                 onMouseLeave={actionLeave}
-                                className="db-action group flex w-full items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-left transition-colors hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                                className="db-action group flex w-full items-center gap-4 rounded-2xl border border-[var(--admin-border-soft)] bg-[var(--admin-soft-2)] p-4 text-left transition-colors hover:bg-[var(--admin-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
                             >
                                 <div
                                     className="db-action-icon flex h-10 w-10 items-center justify-center rounded-xl text-white"
@@ -380,8 +380,8 @@ export default function DashboardOverview() {
                                 >
                                     <Icon size={20} />
                                 </div>
-                                <span className="font-medium text-gray-300 transition-colors group-hover:text-white">{label}</span>
-                                <ChevronRight size={16} className="db-chevron ml-auto text-gray-600 transition-colors group-hover:text-gray-300" />
+                                <span className="font-medium text-[var(--admin-body)] transition-colors group-hover:text-[var(--admin-text)]">{label}</span>
+                                <ChevronRight size={16} className="db-chevron ml-auto text-[var(--admin-faint)] transition-colors group-hover:text-[var(--admin-body)]" />
                             </Link>
                         ))}
                     </div>

@@ -236,11 +236,11 @@ export default function AdminExperiencePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-            <Briefcase className="text-emerald-400" size={28} />
+          <h3 className="text-2xl font-black text-[var(--admin-text)] tracking-tight flex items-center gap-3">
+            <Briefcase className="text-emerald-600 dark:text-emerald-400" size={28} />
             Work Experience
           </h3>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-[var(--admin-muted)] text-sm mt-1">
             Manage positions, achievements and technologies
           </p>
         </div>
@@ -249,13 +249,13 @@ export default function AdminExperiencePage() {
           <button
             onClick={loadExperiences}
             title="Refresh"
-            className="p-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-gray-400 hover:text-white transition-all"
+            className="p-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-soft-3)] text-[var(--admin-muted)] hover:text-[var(--admin-text)] transition-all"
           >
             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={openCreate}
-            className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 text-sm"
+            className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-[var(--admin-text)] px-5 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 text-sm"
           >
             <Plus size={18} />
             Add Experience
@@ -264,7 +264,7 @@ export default function AdminExperiencePage() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
           {error}
         </div>
       )}
@@ -273,14 +273,14 @@ export default function AdminExperiencePage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse bg-[#111114] border border-white/5 rounded-2xl h-28" />
+            <div key={i} className="animate-pulse bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] rounded-2xl h-28" />
           ))}
         </div>
       ) : experiences.length === 0 ? (
-        <div className="bg-[#111114] border border-white/5 rounded-3xl p-16 text-center">
-          <Briefcase className="mx-auto text-gray-600 mb-4" size={48} />
-          <h4 className="text-lg font-bold text-white">No experience added yet</h4>
-          <p className="text-gray-500 text-sm mt-1 max-w-sm mx-auto">
+        <div className="bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] rounded-3xl p-16 text-center">
+          <Briefcase className="mx-auto text-[var(--admin-faint)] mb-4" size={48} />
+          <h4 className="text-lg font-bold text-[var(--admin-text)]">No experience added yet</h4>
+          <p className="text-[var(--admin-muted)] text-sm mt-1 max-w-sm mx-auto">
             Add positions, achievements and the tech you used at each job.
           </p>
         </div>
@@ -289,7 +289,7 @@ export default function AdminExperiencePage() {
           {experiences.map((exp, i) => (
             <div
               key={exp.id || i}
-              className="bg-[#111114] border border-white/5 hover:border-emerald-500/30 p-5 md:p-6 rounded-2xl transition-all duration-300 group"
+              className="bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] hover:border-emerald-500/30 p-5 md:p-6 rounded-2xl transition-all duration-300 group"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
@@ -304,7 +304,7 @@ export default function AdminExperiencePage() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-white font-bold text-base md:text-lg truncate">
+                      <h4 className="text-[var(--admin-text)] font-bold text-base md:text-lg truncate">
                         {exp.position}
                       </h4>
                       <span
@@ -325,13 +325,13 @@ export default function AdminExperiencePage() {
                         {exp.status === 'current' ? 'Current' : 'Completed'}
                       </span>
                     </div>
-                    <p className="text-gray-300 text-sm mt-0.5 truncate">
+                    <p className="text-[var(--admin-body)] text-sm mt-0.5 truncate">
                       {exp.company}
                       {exp.companyType && (
-                        <span className="text-gray-500"> · {exp.companyType}</span>
+                        <span className="text-[var(--admin-muted)]"> · {exp.companyType}</span>
                       )}
                     </p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--admin-muted)] mt-2">
                       {exp.duration && <span>📅 {exp.duration}</span>}
                       {exp.location && <span>📍 {exp.location}</span>}
                       {exp.type && <span>🏢 {exp.type}</span>}
@@ -341,13 +341,13 @@ export default function AdminExperiencePage() {
                         {exp.technologies!.slice(0, 5).map((t) => (
                           <span
                             key={t}
-                            className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] text-gray-300"
+                            className="px-2 py-0.5 rounded-full bg-[var(--admin-soft)] border border-[var(--admin-border)] text-[10px] text-[var(--admin-body)]"
                           >
                             {t}
                           </span>
                         ))}
                         {exp.technologies!.length > 5 && (
-                          <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] text-gray-400">
+                          <span className="px-2 py-0.5 rounded-full bg-[var(--admin-soft)] border border-[var(--admin-border)] text-[10px] text-[var(--admin-muted)]">
                             +{exp.technologies!.length - 5}
                           </span>
                         )}
@@ -360,14 +360,14 @@ export default function AdminExperiencePage() {
                   <button
                     onClick={() => openEdit(exp)}
                     title="Edit"
-                    className="p-2 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-white/5 transition-all"
+                    className="p-2 rounded-lg text-[var(--admin-muted)] hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-[var(--admin-hover)] transition-all"
                   >
                     <Pencil size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(exp.id)}
                     title="Delete"
-                    className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-white/5 transition-all"
+                    className="p-2 rounded-lg text-[var(--admin-muted)] hover:text-red-600 dark:hover:text-red-400 hover:bg-[var(--admin-hover)] transition-all"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -381,16 +381,16 @@ export default function AdminExperiencePage() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/70 overflow-y-auto">
-          <div className="bg-[#111114] border border-white/10 w-full max-w-3xl rounded-3xl p-6 shadow-2xl relative my-8 max-h-[92vh] overflow-y-auto">
+          <div className="bg-[var(--admin-panel)] border border-[var(--admin-border)] w-full max-w-3xl rounded-3xl p-6 shadow-2xl relative my-8 max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-5 top-5 p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10"
+              className="absolute right-5 top-5 p-1.5 rounded-full text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-hover)]"
             >
               <X size={18} />
             </button>
 
-            <h3 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
-              <Briefcase size={20} className="text-emerald-400" />
+            <h3 className="text-xl font-bold text-[var(--admin-text)] mb-5 flex items-center gap-2">
+              <Briefcase size={20} className="text-emerald-600 dark:text-emerald-400" />
               {editingId ? 'Edit Experience' : 'Add Experience'}
             </h3>
 
@@ -398,7 +398,7 @@ export default function AdminExperiencePage() {
               {/* Row 1: company + position */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Company *
                   </label>
                   <input
@@ -407,11 +407,11 @@ export default function AdminExperiencePage() {
                     onChange={(e) => setForm({ ...form, company: e.target.value })}
                     required
                     placeholder="e.g. Precise Tech"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Position *
                   </label>
                   <input
@@ -420,7 +420,7 @@ export default function AdminExperiencePage() {
                     onChange={(e) => setForm({ ...form, position: e.target.value })}
                     required
                     placeholder="e.g. Web Developer"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
               </div>
@@ -428,7 +428,7 @@ export default function AdminExperiencePage() {
               {/* Row 2: location + duration */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Location
                   </label>
                   <input
@@ -436,11 +436,11 @@ export default function AdminExperiencePage() {
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
                     placeholder="e.g. Canada"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Duration
                   </label>
                   <input
@@ -448,7 +448,7 @@ export default function AdminExperiencePage() {
                     value={form.duration}
                     onChange={(e) => setForm({ ...form, duration: e.target.value })}
                     placeholder="e.g. 08/2024 - Present"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
               </div>
@@ -456,13 +456,13 @@ export default function AdminExperiencePage() {
               {/* Row 3: type + companyType + status */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Type
                   </label>
                   <select
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full bg-[#18181b] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-panel-3)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   >
                     {['Remote', 'On-site', 'Hybrid', 'Internship', 'Freelance'].map((t) => (
                       <option key={t}>{t}</option>
@@ -470,7 +470,7 @@ export default function AdminExperiencePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Company type
                   </label>
                   <input
@@ -478,11 +478,11 @@ export default function AdminExperiencePage() {
                     value={form.companyType}
                     onChange={(e) => setForm({ ...form, companyType: e.target.value })}
                     placeholder="e.g. Tech Company"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Status
                   </label>
                   <select
@@ -490,7 +490,7 @@ export default function AdminExperiencePage() {
                     onChange={(e) =>
                       setForm({ ...form, status: e.target.value as 'current' | 'completed' })
                     }
-                    className="w-full bg-[#18181b] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-panel-3)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   >
                     <option value="current">Current</option>
                     <option value="completed">Completed</option>
@@ -501,13 +501,13 @@ export default function AdminExperiencePage() {
               {/* Row 4: icon + accent */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Icon
                   </label>
                   <select
                     value={form.icon}
                     onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                    className="w-full bg-[#18181b] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-panel-3)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   >
                     {ICON_OPTIONS.map((i) => (
                       <option key={i}>{i}</option>
@@ -515,7 +515,7 @@ export default function AdminExperiencePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Accent gradient
                   </label>
                   <div className="flex gap-2">
@@ -527,7 +527,7 @@ export default function AdminExperiencePage() {
                           key={idx}
                           onClick={() => setForm({ ...form, from, to })}
                           className={`h-10 w-10 rounded-xl border-2 transition-all ${
-                            on ? 'border-white scale-110' : 'border-transparent'
+                            on ? 'border-[var(--admin-text)] scale-110' : 'border-transparent'
                           }`}
                           style={{
                             background: `linear-gradient(135deg, ${from}, ${to})`,
@@ -542,7 +542,7 @@ export default function AdminExperiencePage() {
 
               {/* Achievements (one per line) */}
               <div>
-                <label className="text-xs font-semibold text-gray-400 block mb-1">
+                <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                   Achievements (one per line)
                 </label>
                 <textarea
@@ -552,13 +552,13 @@ export default function AdminExperiencePage() {
                   }
                   rows={4}
                   placeholder={'Worked on ERP solutions\nCollaborated with cross-functional teams'}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500 resize-none"
+                  className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500 resize-none"
                 />
               </div>
 
               {/* Projects (comma separated) */}
               <div>
-                <label className="text-xs font-semibold text-gray-400 block mb-1">
+                <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                   Notable projects (comma separated)
                 </label>
                 <input
@@ -566,13 +566,13 @@ export default function AdminExperiencePage() {
                   value={toCSV(form.projects)}
                   onChange={(e) => setForm({ ...form, projects: fromCSV(e.target.value) })}
                   placeholder="Nature Clam, Sowa Tooling"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
               {/* Technologies (comma separated) */}
               <div>
-                <label className="text-xs font-semibold text-gray-400 block mb-1">
+                <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                   Technologies (comma separated)
                 </label>
                 <input
@@ -580,13 +580,13 @@ export default function AdminExperiencePage() {
                   value={toCSV(form.technologies)}
                   onChange={(e) => setForm({ ...form, technologies: fromCSV(e.target.value) })}
                   placeholder="JavaScript, TypeScript, Jira"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
               {/* Skills (comma separated) */}
               <div>
-                <label className="text-xs font-semibold text-gray-400 block mb-1">
+                <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                   Skills gained (comma separated)
                 </label>
                 <input
@@ -594,23 +594,23 @@ export default function AdminExperiencePage() {
                   value={toCSV(form.skills)}
                   onChange={(e) => setForm({ ...form, skills: fromCSV(e.target.value) })}
                   placeholder="Enterprise Solutions, Agile Development"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-3 pt-4 border-t border-white/5 mt-4">
+              <div className="flex items-center gap-3 pt-4 border-t border-[var(--admin-border-soft)] mt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-sm font-semibold"
+                  className="flex-1 py-2.5 rounded-xl bg-[var(--admin-soft)] hover:bg-[var(--admin-hover)] text-[var(--admin-body)] text-sm font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-[var(--admin-text)] text-sm font-bold shadow-lg shadow-emerald-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {saving && <Loader2 size={16} className="animate-spin" />}
                   {saving

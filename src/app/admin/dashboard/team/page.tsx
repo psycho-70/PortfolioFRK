@@ -224,11 +224,11 @@ export default function TeamPage() {
             {/* Header with Search and Add Button */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                        <Users className="text-purple-400" size={28} />
+                    <h3 className="text-2xl font-black text-[var(--admin-text)] tracking-tight flex items-center gap-3">
+                        <Users className="text-purple-600 dark:text-purple-400" size={28} />
                         Team Members
                     </h3>
-                    <p className="text-gray-400 text-sm mt-1">
+                    <p className="text-[var(--admin-muted)] text-sm mt-1">
                         Manage all collaborators and team profiles displayed across your portfolio
                     </p>
                 </div>
@@ -237,13 +237,13 @@ export default function TeamPage() {
                     <button
                         onClick={fetchTeam}
                         title="Refresh"
-                        className="p-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-gray-400 hover:text-white hover:border-purple-500/30 transition-all"
+                        className="p-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-soft-3)] text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:border-purple-500/30 transition-all"
                     >
                         <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
                     </button>
                     <button
                         onClick={() => handleOpenModal()}
-                        className="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-600/25 active:scale-95"
+                        className="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-[var(--admin-text)] px-5 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-600/25 active:scale-95"
                     >
                         <Plus size={18} />
                         Add Member
@@ -253,13 +253,13 @@ export default function TeamPage() {
 
             {/* Search filter */}
             <div className="relative max-w-md">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--admin-muted)]" size={18} />
                 <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by name or position..."
-                    className="w-full bg-[#111114] border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    className="w-full bg-[var(--admin-panel)] border border-[var(--admin-border)] rounded-xl py-2.5 pl-10 pr-4 text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-muted)] focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                 />
             </div>
 
@@ -267,14 +267,14 @@ export default function TeamPage() {
             {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse bg-[#111114] border border-white/5 rounded-2xl p-6 h-64" />
+                        <div key={i} className="animate-pulse bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] rounded-2xl p-6 h-64" />
                     ))}
                 </div>
             ) : filteredTeam.length === 0 ? (
-                <div className="bg-[#111114] border border-white/5 rounded-3xl p-16 text-center">
-                    <Users className="mx-auto text-gray-600 mb-4" size={48} />
-                    <h4 className="text-lg font-bold text-white">No team members found</h4>
-                    <p className="text-gray-500 text-sm mt-1 max-w-sm mx-auto">
+                <div className="bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] rounded-3xl p-16 text-center">
+                    <Users className="mx-auto text-[var(--admin-faint)] mb-4" size={48} />
+                    <h4 className="text-lg font-bold text-[var(--admin-text)]">No team members found</h4>
+                    <p className="text-[var(--admin-muted)] text-sm mt-1 max-w-sm mx-auto">
                         {searchQuery ? "Try a different search term." : "Click 'Add Member' above to create your first team profile."}
                     </p>
                 </div>
@@ -285,7 +285,7 @@ export default function TeamPage() {
                         return (
                             <div
                                 key={member.id || member.name}
-                                className="group relative bg-[#111114] border border-white/5 hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between"
+                                className="group relative bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between"
                             >
                                 <div>
                                     {/* Top Row: Avatar + Status Badge + Actions */}
@@ -295,7 +295,7 @@ export default function TeamPage() {
                                                 <img
                                                     src={imgUrl}
                                                     alt={member.name}
-                                                    className="w-16 h-16 rounded-2xl object-cover border border-white/10 shadow-md bg-white/5"
+                                                    className="w-16 h-16 rounded-2xl object-cover border border-[var(--admin-border)] shadow-md bg-[var(--admin-soft)]"
                                                     onError={(e) => {
                                                         (e.target as HTMLElement).style.display = "none";
                                                     }}
@@ -306,7 +306,7 @@ export default function TeamPage() {
                                                 </div>
                                             )}
                                             <span
-                                                className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[#111114] ${
+                                                className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--admin-panel)] ${
                                                     member.status === "Available" ? "bg-emerald-400" : "bg-orange-400"
                                                 }`}
                                                 title={member.status}
@@ -316,14 +316,14 @@ export default function TeamPage() {
                                         <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
                                             <button
                                                 onClick={() => handleOpenModal(member)}
-                                                className="p-2 rounded-lg bg-white/5 hover:bg-purple-600/20 text-gray-400 hover:text-purple-300 transition-colors"
+                                                className="p-2 rounded-lg bg-[var(--admin-soft)] hover:bg-purple-600/20 text-[var(--admin-muted)] hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                                                 title="Edit member"
                                             >
                                                 <Edit3 size={16} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(member.id)}
-                                                className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors"
+                                                className="p-2 rounded-lg bg-[var(--admin-soft)] hover:bg-red-500/20 text-[var(--admin-muted)] hover:text-red-600 dark:hover:text-red-400 transition-colors"
                                                 title="Delete member"
                                             >
                                                 <Trash2 size={16} />
@@ -332,15 +332,15 @@ export default function TeamPage() {
                                     </div>
 
                                     {/* Name & Position */}
-                                    <h4 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                                    <h4 className="text-xl font-bold text-[var(--admin-text)] group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
                                         {member.name}
                                     </h4>
-                                    <p className="text-sm font-semibold text-purple-400 mt-0.5">
+                                    <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mt-0.5">
                                         {member.position}
                                     </p>
 
                                     {/* Expertise description */}
-                                    <p className="text-xs text-gray-400 mt-3 line-clamp-2 leading-relaxed">
+                                    <p className="text-xs text-[var(--admin-muted)] mt-3 line-clamp-2 leading-relaxed">
                                         {member.expertise || "No bio description provided."}
                                     </p>
 
@@ -350,13 +350,13 @@ export default function TeamPage() {
                                             {member.skills.slice(0, 4).map((s) => (
                                                 <span
                                                     key={s}
-                                                    className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-gray-300 font-medium"
+                                                    className="px-2.5 py-0.5 rounded-full bg-[var(--admin-soft)] border border-[var(--admin-border)] text-[11px] text-[var(--admin-body)] font-medium"
                                                 >
                                                     {s}
                                                 </span>
                                             ))}
                                             {member.skills.length > 4 && (
-                                                <span className="px-2 py-0.5 text-[11px] text-gray-500 font-medium">
+                                                <span className="px-2 py-0.5 text-[11px] text-[var(--admin-muted)] font-medium">
                                                     +{member.skills.length - 4}
                                                 </span>
                                             )}
@@ -365,13 +365,13 @@ export default function TeamPage() {
                                 </div>
 
                                 {/* Footer meta: Experience & Completed Projects */}
-                                <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-400">
+                                <div className="mt-6 pt-4 border-t border-[var(--admin-border-soft)] flex items-center justify-between text-xs text-[var(--admin-muted)]">
                                     <div className="flex items-center gap-1.5">
-                                        <Briefcase size={14} className="text-gray-500" />
+                                        <Briefcase size={14} className="text-[var(--admin-muted)]" />
                                         <span>{member.projects} Projects</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                        <Clock size={14} className="text-gray-500" />
+                                        <Clock size={14} className="text-[var(--admin-muted)]" />
                                         <span>{member.experience}</span>
                                     </div>
                                 </div>
@@ -389,26 +389,26 @@ export default function TeamPage() {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-[#111114] border border-white/10 w-full max-w-xl rounded-3xl overflow-hidden p-6 sm:p-8 shadow-2xl my-8 relative"
+                            className="bg-[var(--admin-panel)] border border-[var(--admin-border)] w-full max-w-xl rounded-3xl overflow-hidden p-6 sm:p-8 shadow-2xl my-8 relative"
                         >
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="absolute right-6 top-6 p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                                className="absolute right-6 top-6 p-2 rounded-full text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-hover)] transition-colors"
                             >
                                 <X size={20} />
                             </button>
 
-                            <h3 className="text-2xl font-bold text-white mb-2">
+                            <h3 className="text-2xl font-bold text-[var(--admin-text)] mb-2">
                                 {currentMember ? "Edit Team Member" : "Add Team Member"}
                             </h3>
-                            <p className="text-sm text-gray-500 mb-6">
+                            <p className="text-sm text-[var(--admin-muted)] mb-6">
                                 Provide profile details and skills for this collaborator.
                             </p>
 
                             <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                        <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                             Full Name *
                                         </label>
                                         <input
@@ -417,12 +417,12 @@ export default function TeamPage() {
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                             required
                                             placeholder="e.g. Nasir Khan"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-purple-500"
+                                            className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-purple-500"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                        <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                             Position / Role *
                                         </label>
                                         <input
@@ -431,20 +431,20 @@ export default function TeamPage() {
                                             onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                                             required
                                             placeholder="e.g. Software Engineer"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-purple-500"
+                                            className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-purple-500"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                        <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                             Status
                                         </label>
                                         <select
                                             value={formData.status}
                                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                            className="w-full bg-[#18181b] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-purple-500"
+                                            className="w-full bg-[var(--admin-panel-3)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-purple-500"
                                         >
                                             <option value="Available">Available</option>
                                             <option value="Busy">Busy</option>
@@ -452,7 +452,7 @@ export default function TeamPage() {
                                     </div>
 
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                        <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                             Projects Done
                                         </label>
                                         <input
@@ -460,12 +460,12 @@ export default function TeamPage() {
                                             value={formData.projects}
                                             onChange={(e) => setFormData({ ...formData, projects: e.target.value })}
                                             min="0"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-purple-500"
+                                            className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-purple-500"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                        <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                             Experience
                                         </label>
                                         <input
@@ -473,13 +473,13 @@ export default function TeamPage() {
                                             value={formData.experience}
                                             onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
                                             placeholder="e.g. 4+ years"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-purple-500"
+                                            className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-purple-500"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                    <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                         Skills (comma-separated)
                                     </label>
                                     <input
@@ -487,12 +487,12 @@ export default function TeamPage() {
                                         value={formData.skills}
                                         onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                                         placeholder="React, Node.js, UI/UX, TypeScript..."
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-purple-500"
+                                        className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                    <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                         Expertise &amp; Bio
                                     </label>
                                     <textarea
@@ -500,12 +500,12 @@ export default function TeamPage() {
                                         onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
                                         rows={3}
                                         placeholder="Brief description of their responsibilities, specialities..."
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-purple-500 resize-none"
+                                        className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-purple-500 resize-none"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-semibold text-gray-400 block mb-1">
+                                    <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                                         Profile Photo
                                     </label>
                                     <div className="flex items-center gap-4">
@@ -513,14 +513,14 @@ export default function TeamPage() {
                                             <img
                                                 src={imagePreview}
                                                 alt="Preview"
-                                                className="w-14 h-14 rounded-xl object-cover border border-white/10"
+                                                className="w-14 h-14 rounded-xl object-cover border border-[var(--admin-border)]"
                                             />
                                         ) : (
-                                            <div className="w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-500">
+                                            <div className="w-14 h-14 rounded-xl bg-[var(--admin-soft)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-muted)]">
                                                 <UploadCloud size={20} />
                                             </div>
                                         )}
-                                        <label className="cursor-pointer bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-xs font-semibold text-purple-400 transition-colors">
+                                        <label className="cursor-pointer bg-[var(--admin-soft)] hover:bg-[var(--admin-hover)] border border-[var(--admin-border)] px-4 py-2 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 transition-colors">
                                             Choose Image
                                             <input
                                                 type="file"
@@ -532,18 +532,18 @@ export default function TeamPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-3 pt-6 border-t border-white/5 mt-6">
+                                <div className="flex items-center gap-3 pt-6 border-t border-[var(--admin-border-soft)] mt-6">
                                     <button
                                         type="button"
                                         onClick={() => setIsModalOpen(false)}
-                                        className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 font-semibold text-gray-300 transition-all text-sm"
+                                        className="flex-1 py-3 rounded-xl bg-[var(--admin-soft)] hover:bg-[var(--admin-hover)] font-semibold text-[var(--admin-body)] transition-all text-sm"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-lg shadow-purple-600/25 disabled:opacity-50 text-sm"
+                                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-[var(--admin-text)] font-bold transition-all shadow-lg shadow-purple-600/25 disabled:opacity-50 text-sm"
                                     >
                                         {isSubmitting ? "Saving..." : currentMember ? "Update Member" : "Save Member"}
                                     </button>

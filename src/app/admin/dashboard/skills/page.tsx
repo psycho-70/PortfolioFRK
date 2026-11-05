@@ -204,11 +204,11 @@ export default function SkillsPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-            <Code2 className="text-emerald-400" size={28} />
+          <h3 className="text-2xl font-black text-[var(--admin-text)] tracking-tight flex items-center gap-3">
+            <Code2 className="text-emerald-600 dark:text-emerald-400" size={28} />
             Technical Skills
           </h3>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-[var(--admin-muted)] text-sm mt-1">
             Manage your active tech stack and proficiency levels
           </p>
         </div>
@@ -217,13 +217,13 @@ export default function SkillsPage() {
           <button
             onClick={fetchSkills}
             title="Refresh"
-            className="p-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-gray-400 hover:text-white transition-all"
+            className="p-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-soft-3)] text-[var(--admin-muted)] hover:text-[var(--admin-text)] transition-all"
           >
             <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 text-sm"
+            className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-[var(--admin-text)] px-5 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 text-sm"
           >
             <Plus size={18} />
             Add Skill
@@ -232,7 +232,7 @@ export default function SkillsPage() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
           {error}
         </div>
       )}
@@ -242,15 +242,15 @@ export default function SkillsPage() {
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="animate-pulse bg-[#111114] border border-white/5 rounded-2xl h-24"
+              className="animate-pulse bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] rounded-2xl h-24"
             />
           ))}
         </div>
       ) : skills.length === 0 ? (
-        <div className="bg-[#111114] border border-white/5 rounded-3xl p-16 text-center">
-          <Code2 className="mx-auto text-gray-600 mb-4" size={48} />
-          <h4 className="text-lg font-bold text-white">No skills added yet</h4>
-          <p className="text-gray-500 text-sm mt-1 max-w-sm mx-auto">
+        <div className="bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] rounded-3xl p-16 text-center">
+          <Code2 className="mx-auto text-[var(--admin-faint)] mb-4" size={48} />
+          <h4 className="text-lg font-bold text-[var(--admin-text)]">No skills added yet</h4>
+          <p className="text-[var(--admin-muted)] text-sm mt-1 max-w-sm mx-auto">
             Add frameworks, languages, and tools to highlight your competencies.
           </p>
         </div>
@@ -259,18 +259,18 @@ export default function SkillsPage() {
           {skills.map((skill) => (
             <div
               key={skill.id || skill.name}
-              className="bg-[#111114] border border-white/5 hover:border-emerald-500/30 p-5 rounded-2xl transition-all duration-300 flex items-center justify-between group"
+              className="bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] hover:border-emerald-500/30 p-5 rounded-2xl transition-all duration-300 flex items-center justify-between group"
             >
               <div>
-                <h4 className="text-white font-bold text-base group-hover:text-emerald-300 transition-colors">
+                <h4 className="text-[var(--admin-text)] font-bold text-base group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
                   {skill.name}
                 </h4>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-400 font-medium">
+                  <span className="text-xs text-[var(--admin-muted)] font-medium">
                     {skill.category || "General"}
                   </span>
                   {skill.level && (
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[10px] text-emerald-400 font-semibold border border-emerald-500/20">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
                       {skill.level}
                       {typeof skill.numericLevel === "number" && (
                         <span className="ml-1 opacity-70">
@@ -283,7 +283,7 @@ export default function SkillsPage() {
               </div>
               <button
                 onClick={() => handleDelete(skill.id)}
-                className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-white/5 opacity-0 group-hover:opacity-100 transition-all"
+                className="p-2 rounded-lg text-[var(--admin-muted)] hover:text-red-600 dark:hover:text-red-400 hover:bg-[var(--admin-hover)] opacity-0 group-hover:opacity-100 transition-all"
                 title="Delete skill"
               >
                 <Trash2 size={16} />
@@ -295,19 +295,19 @@ export default function SkillsPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/70">
-          <div className="bg-[#111114] border border-white/10 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
+          <div className="bg-[var(--admin-panel)] border border-[var(--admin-border)] w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-5 top-5 p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10"
+              className="absolute right-5 top-5 p-1.5 rounded-full text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-hover)]"
             >
               <X size={18} />
             </button>
-            <h3 className="text-xl font-bold text-white mb-4">
+            <h3 className="text-xl font-bold text-[var(--admin-text)] mb-4">
               Add Technical Skill
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-gray-400 block mb-1">
+                <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                   Skill Name *
                 </label>
                 <input
@@ -318,13 +318,13 @@ export default function SkillsPage() {
                   }
                   required
                   placeholder="e.g. Next.js, Docker, GSAP"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Category
                   </label>
                   <select
@@ -332,7 +332,7 @@ export default function SkillsPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value })
                     }
-                    className="w-full bg-[#18181b] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-panel-3)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   >
                     <option value="Frontend">Frontend</option>
                     <option value="Backend">Backend</option>
@@ -349,7 +349,7 @@ export default function SkillsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 block mb-1">
+                  <label className="text-xs font-semibold text-[var(--admin-muted)] block mb-1">
                     Level
                   </label>
                   <select
@@ -357,7 +357,7 @@ export default function SkillsPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, level: e.target.value })
                     }
-                    className="w-full bg-[#18181b] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full bg-[var(--admin-panel-3)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 text-[var(--admin-text)] text-sm outline-none focus:ring-1 focus:ring-emerald-500"
                   >
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
@@ -367,18 +367,18 @@ export default function SkillsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pt-4 border-t border-white/5 mt-4">
+              <div className="flex items-center gap-3 pt-4 border-t border-[var(--admin-border-soft)] mt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-sm font-semibold"
+                  className="flex-1 py-2.5 rounded-xl bg-[var(--admin-soft)] hover:bg-[var(--admin-hover)] text-[var(--admin-body)] text-sm font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-600/20 disabled:opacity-50"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-[var(--admin-text)] text-sm font-bold shadow-lg shadow-emerald-600/20 disabled:opacity-50"
                 >
                   {isSubmitting ? "Adding..." : "Add Skill"}
                 </button>

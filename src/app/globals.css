@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
     --background: 255, 255, 255;
     --foreground: 15, 15, 25;
@@ -402,4 +404,119 @@ body::-webkit-scrollbar {
     background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
     transform-origin: left;
     z-index: 9999;
+}
+
+/* ===== ADMIN DASHBOARD THEME ===== */
+.admin-root {
+    color-scheme: dark;
+    --admin-bg: #0a0a0c;
+    --admin-panel: #111114;
+    --admin-panel-2: #16161a;
+    --admin-panel-3: #18181b;
+    --admin-text: #ffffff;
+    --admin-body: #d1d5db;
+    --admin-muted: #9ca3af;
+    --admin-faint: #6b7280;
+    --admin-border: rgba(255, 255, 255, 0.1);
+    --admin-border-soft: rgba(255, 255, 255, 0.06);
+    --admin-soft: rgba(255, 255, 255, 0.05);
+    --admin-soft-2: rgba(255, 255, 255, 0.02);
+    --admin-soft-3: rgba(255, 255, 255, 0.03);
+    --admin-hover: rgba(255, 255, 255, 0.08);
+    --admin-scroll-thumb: rgba(148, 163, 184, 0.45);
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+html:not(.dark) .admin-root {
+    color-scheme: light;
+    --admin-bg: #f2f3f8;
+    --admin-panel: #ffffff;
+    --admin-panel-2: #ffffff;
+    --admin-panel-3: #f8fafc;
+    --admin-text: #0f172a;
+    --admin-body: #334155;
+    --admin-muted: #64748b;
+    --admin-faint: #94a3b8;
+    --admin-border: rgba(15, 23, 42, 0.14);
+    --admin-border-soft: rgba(15, 23, 42, 0.08);
+    --admin-soft: rgba(15, 23, 42, 0.05);
+    --admin-soft-2: rgba(15, 23, 42, 0.025);
+    --admin-soft-3: rgba(15, 23, 42, 0.035);
+    --admin-hover: rgba(15, 23, 42, 0.07);
+    --admin-scroll-thumb: rgba(100, 116, 139, 0.5);
+}
+
+/* Keep labels readable on coloured/gradient action buttons in light mode */
+html:not(.dark) .admin-root [class*="bg-gradient-to"] {
+    color: #ffffff;
+}
+
+html:not(.dark) .admin-root .admin-accent-solid {
+    color: #ffffff;
+}
+
+/* Solid accent buttons/fills keep white labels in light mode */
+html:not(.dark) .admin-root .bg-purple-600,
+html:not(.dark) .admin-root .bg-purple-500,
+html:not(.dark) .admin-root .bg-indigo-600,
+html:not(.dark) .admin-root .bg-indigo-500,
+html:not(.dark) .admin-root .bg-emerald-600,
+html:not(.dark) .admin-root .bg-emerald-500,
+html:not(.dark) .admin-root .bg-red-500,
+html:not(.dark) .admin-root .bg-red-600,
+html:not(.dark) .admin-root .bg-pink-600,
+html:not(.dark) .admin-root .bg-blue-600,
+html:not(.dark) .admin-root .bg-cyan-600,
+html:not(.dark) .admin-root .bg-amber-500,
+html:not(.dark) .admin-root .bg-orange-600 {
+    color: #ffffff;
+}
+
+/* Scrollable dashboard area gets a visible, slim scrollbar */
+.admin-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--admin-scroll-thumb) transparent;
+}
+
+.admin-scroll::-webkit-scrollbar {
+    display: block;
+    width: 10px;
+    height: 10px;
+}
+
+.admin-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb {
+    background: var(--admin-scroll-thumb);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--admin-muted);
+    background-clip: content-box;
+}
+
+/* Generic opt-in scrollbar for modals/panels */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--admin-scroll-thumb, rgba(148, 163, 184, 0.45)) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--admin-scroll-thumb, rgba(148, 163, 184, 0.45));
+    border-radius: 999px;
 }

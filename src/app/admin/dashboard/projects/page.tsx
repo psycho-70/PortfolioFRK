@@ -223,15 +223,15 @@ export default function ProjectPage() {
     const selectedTotal = selectedFiles.reduce((sum, f) => sum + f.size, 0);
 
     return (
-        <div className="bg-[#111114] border border-white/5 rounded-3xl p-8 relative">
-            <div className="flex items-center justify-between mb-8">
+        <div className="bg-[var(--admin-panel)] border border-[var(--admin-border-soft)] rounded-3xl p-4 sm:p-6 lg:p-8 relative">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                 <div>
-                    <h3 className="text-xl font-bold text-white">Portfolio Projects</h3>
-                    <p className="text-gray-500 text-sm mt-1">Manage all projects displayed on the homepage</p>
+                    <h3 className="text-xl font-bold text-[var(--admin-text)]">Portfolio Projects</h3>
+                    <p className="text-[var(--admin-muted)] text-sm mt-1">Manage all projects displayed on the homepage</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg shadow-purple-600/20"
+                    className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-600/20 w-full sm:w-auto"
                 >
                     <Plus size={20} /> Add Project
                 </button>
@@ -243,51 +243,51 @@ export default function ProjectPage() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-gray-500 text-sm border-b border-white/5">
+                            <tr className="text-[var(--admin-muted)] text-sm border-b border-[var(--admin-border-soft)]">
                                 <th className="pb-4 font-medium">Project Name</th>
                                 <th className="pb-4 font-medium">Category</th>
                                 <th className="pb-4 font-medium">Links</th>
                                 <th className="pb-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-[var(--admin-border-soft)]">
                             {projects.map((project) => (
-                                <tr key={project.id} className="group hover:bg-white/[0.02] transition-colors">
+                                <tr key={project.id} className="group hover:bg-[var(--admin-soft-2)] transition-colors">
                                     <td className="py-5">
                                         <div className="flex items-center gap-3">
                                             {project.images && project.images.length > 0 ? (
                                                 <img
                                                     src={getImageSrc(project.images[0])}
                                                     alt={project.title}
-                                                    className="w-12 h-8 rounded-lg object-cover bg-gray-800"
+                                                    className="w-12 h-8 rounded-lg object-cover bg-[var(--admin-soft-3)]"
                                                 />
                                             ) : (
-                                                <div className="w-12 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-[10px]">No Img</div>
+                                                <div className="w-12 h-8 rounded-lg bg-[var(--admin-soft-3)] flex items-center justify-center text-[10px] text-[var(--admin-muted)]">No Img</div>
                                             )}
                                             <div>
-                                                <p className="text-white font-medium">{project.title}</p>
-                                                <p className="text-xs text-gray-500 truncate max-w-[200px]">{project.description}</p>
+                                                <p className="text-[var(--admin-text)] font-medium">{project.title}</p>
+                                                <p className="text-xs text-[var(--admin-muted)] truncate max-w-[200px]">{project.description}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-5 text-sm">{project.category || "Uncategorized"}</td>
                                     <td className="py-5">
                                         <div className="flex gap-2">
-                                            {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="p-1 hover:text-purple-400"><Globe size={14} /></a>}
-                                            {project.github && <a href={project.github} target="_blank" rel="noreferrer" className="p-1 hover:text-purple-400"><Code2 size={14} /></a>}
+                                            {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="p-1 hover:text-purple-600 dark:hover:text-purple-400"><Globe size={14} /></a>}
+                                            {project.github && <a href={project.github} target="_blank" rel="noreferrer" className="p-1 hover:text-purple-600 dark:hover:text-purple-400"><Code2 size={14} /></a>}
                                         </div>
                                     </td>
                                     <td className="py-5 text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => handleOpenModal(project)}
-                                                className="p-2 text-gray-500 hover:text-white transition-colors"
+                                                className="p-2 text-[var(--admin-muted)] hover:text-[var(--admin-text)] transition-colors"
                                             >
                                                 <Settings size={18} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(project.id)}
-                                                className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                                                className="p-2 text-[var(--admin-muted)] hover:text-red-500 transition-colors"
                                             >
                                                 <LogOut size={18} className="rotate-90" />
                                             </button>
@@ -306,9 +306,9 @@ export default function ProjectPage() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-[#111114] border border-white/10 w-full max-w-2xl rounded-2xl overflow-hidden p-8 shadow-2xl my-8"
+                        className="bg-[var(--admin-panel)] border border-[var(--admin-border)] w-full max-w-2xl rounded-2xl overflow-hidden p-4 sm:p-6 lg:p-8 shadow-2xl my-8"
                     >
-                        <h3 className="text-2xl font-bold text-white mb-6">
+                        <h3 className="text-2xl font-bold text-[var(--admin-text)] mb-6">
                             {currentProject ? "Edit Project" : "Add New Project"}
                         </h3>
                         <form
@@ -318,109 +318,109 @@ export default function ProjectPage() {
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs text-gray-500 block mb-1">Project Title</label>
+                                    <label className="text-xs text-[var(--admin-muted)] block mb-1">Project Title</label>
                                     <input
                                         type="text"
                                         value={formData.title}
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         required
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
+                                        className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-500 block mb-1">Category</label>
+                                    <label className="text-xs text-[var(--admin-muted)] block mb-1">Category</label>
                                     <input
                                         type="text"
                                         value={formData.category}
                                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
+                                        className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-xs text-gray-500 block mb-1">Technologies (comma separated)</label>
+                                <label className="text-xs text-[var(--admin-muted)] block mb-1">Technologies (comma separated)</label>
                                 <input
                                     type="text"
                                     value={formData.technologies}
                                     onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
                                     placeholder="React, Node.js, Tailwind..."
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
+                                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs text-gray-500 block mb-1">Short Description</label>
+                                <label className="text-xs text-[var(--admin-muted)] block mb-1">Short Description</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     required
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 h-20"
+                                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 h-20"
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs text-gray-500 block mb-1">Long Description (Content Editor)</label>
+                                <label className="text-xs text-[var(--admin-muted)] block mb-1">Long Description (Content Editor)</label>
                                 <textarea
                                     value={formData.longDescription}
                                     onChange={(e) => setFormData({ ...formData, longDescription: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 h-40"
+                                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 h-40"
                                     placeholder="Detailed overview of the project..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs text-gray-500 block mb-1">Live Link</label>
+                                    <label className="text-xs text-[var(--admin-muted)] block mb-1">Live Link</label>
                                     <input
                                         type="url"
                                         value={formData.link}
                                         onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
+                                        className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-500 block mb-1">GitHub Link</label>
+                                    <label className="text-xs text-[var(--admin-muted)] block mb-1">GitHub Link</label>
                                     <input
                                         type="url"
                                         value={formData.github}
                                         onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
+                                        className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-xs text-gray-500 block mb-1">Upload Multiple Images</label>
+                                <label className="text-xs text-[var(--admin-muted)] block mb-1">Upload Multiple Images</label>
                                 <input
                                     type="file"
                                     accept="image/*"
                                     multiple
                                     onChange={handleFileChange}
-                                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-600/10 file:text-purple-400 hover:file:bg-purple-600/20"
+                                    className="w-full text-sm text-[var(--admin-muted)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-600/10 file:text-purple-600 dark:text-purple-400 hover:file:bg-purple-600/20"
                                 />
-                                <p className="text-[10px] text-gray-600 mt-1">
+                                <p className="text-[10px] text-[var(--admin-faint)] mt-1">
                                     First image will be the primary thumbnail. Images are resized automatically; total must stay under {formatMB(MAX_TOTAL_BYTES)} MB.
                                     {currentProject && " Uploading new images replaces the existing ones."}
                                 </p>
                                 {selectedFiles.length > 0 && (
-                                    <p className="text-[11px] text-gray-400 mt-1">
+                                    <p className="text-[11px] text-[var(--admin-muted)] mt-1">
                                         {selectedFiles.length} image{selectedFiles.length > 1 ? "s" : ""} selected ({formatMB(selectedTotal)} MB)
                                     </p>
                                 )}
                             </div>
 
                             {formError && (
-                                <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                                <div className="text-sm text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
                                     {formError}
                                 </div>
                             )}
                         </form>
-                        <div className="flex gap-3 pt-6 border-t border-white/5 mt-4">
+                        <div className="flex gap-3 pt-6 border-t border-[var(--admin-border-soft)] mt-4">
                             <button
                                 type="button"
                                 onClick={() => setIsModalOpen(false)}
-                                className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 font-medium transition-all"
+                                className="flex-1 py-3 rounded-xl bg-[var(--admin-soft)] hover:bg-[var(--admin-hover)] font-medium transition-all"
                             >
                                 Cancel
                             </button>
@@ -428,7 +428,7 @@ export default function ProjectPage() {
                                 type="submit"
                                 form="project-form"
                                 disabled={isSaving}
-                                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-lg shadow-purple-600/20 disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-[var(--admin-text)] font-bold transition-all shadow-lg shadow-purple-600/20 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 {isSaving ? "Saving..." : currentProject ? "Update Segment" : "Create Segment"}
                             </button>

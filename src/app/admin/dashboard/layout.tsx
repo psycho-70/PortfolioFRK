@@ -1,25 +1,35 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
     LayoutDashboard,
     Briefcase,
     Code2,
     MessageSquare,
     Users,
+    Building2,
     Settings,
     LogOut,
     Bell,
     Search,
-    ShieldCheck as ShieldCheckIcon
+    ShieldCheck,
+    Menu,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    Sun,
+    Moon,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { useAppContext } from "@/Context/AppContext";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [collapsed, setCollapsed] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
+    const { darkMode, toggleDarkMode } = useAppContext();
 
     useEffect(() => {
         const token = localStorage.getItem("adminToken");
@@ -28,11 +38,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
     }, [router]);
 
+    useEffect(() => {
+        setMobileOpen(false);
+    }, [pathname]);
+
     const handleLogout = () => {
         localStorage.removeItem("adminToken");
         router.push("/admin/login");
     };
-    // Define navigation items for the sidebar
 
     const navItems = [
         { id: "overview", label: "Overview", icon: LayoutDashboard, path: "/admin/dashboard" },
@@ -40,36 +53,58 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { id: "skills", label: "Skills", icon: Code2, path: "/admin/dashboard/skills" },
         { id: "messages", label: "Messages", icon: MessageSquare, path: "/admin/dashboard/messages" },
         { id: "team", label: "Team", icon: Users, path: "/admin/dashboard/team" },
-        { id: "experience", label: "Experience", icon: Users, path: "/admin/dashboard/experience" },
+        { id: "experience", label: "Experience", icon: Building2, path: "/admin/dashboard/experience" },
         { id: "settings", label: "Settings", icon: Settings, path: "/admin/dashboard/settings" },
     ];
 
-    const activeItem = navItems.find(item => item.path === pathname) || navItems[0];
+    const activeItem = navItems.find((item) => item.path === pathname) || navItems[0];
+    const showLabels = !collapsed || mobileOpen;
 
     return (
-        <div className="min-h-screen bg-[#0a0a0c] text-gray-300 font-sans flex overflow-hidden">
+        <div className="admin-root flex h-[100dvh] w-full overflow-hidden bg-[var(--admin-bg)] text-[var(--admin-text)]">
+            {/* Mobile overlay */}
+            <AnimatePresence>
+                {mobileOpen && (
+                    <motion.button
+                        key="admin-overlay"
+                        type="button"
+                        aria-label="Close menu"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setMobileOpen(false)}
+                        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+                    />
+                )}
+            </AnimatePresence>
+
             {/* Sidebar */}
-            <motion.aside
-                initial={false}
-                animate={{ width: isSidebarOpen ? 260 : 80 }}
-                className="h-screen bg-[#111114] border-r border-white/5 flex flex-col relative z-50"
+            <aside
+                className={`fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-[268px] shrink-0 flex-col border-r border-[var(--admin-border-soft)] bg-[var(--admin-panel)] transition-transform duration-300 md:static md:translate-x-0 ${
+                    mobileOpen ? "translate-x-0" : "-translate-x-full"
+                } ${collapsed ? "md:w-[80px]" : "md:w-[268px]"}`}
             >
-                <div className="p-6 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white flex-shrink-0">
-                        <ShieldCheckIcon size={20} />
+                <div className={`flex h-16 shrink-0 items-center gap-3 border-b border-[var(--admin-border-soft)] px-5 md:h-20 ${collapsed ? "md:justify-center md:px-3" : ""}`}>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-600/20">
+                        <ShieldCheck size={20} />
                     </div>
-                    {isSidebarOpen && (
-                        <motion.span
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="font-bold text-white text-lg tracking-tight"
-                        >
-                            ANTIGRAVITY
-                        </motion.span>
+                    {showLabels && (
+                        <div className="min-w-0">
+                            <p className="truncate text-base font-bold tracking-tight text-[var(--admin-text)]">ANTIGRAVITY</p>
+                            <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--admin-muted)]">Admin panel</p>
+                        </div>
                     )}
+                    <button
+                        type="button"
+                        onClick={() => setMobileOpen(false)}
+                        className="ml-auto rounded-lg p-2 text-[var(--admin-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)] md:hidden"
+                        aria-label="Close sidebar"
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
 
-                <nav className="flex-1 mt-6 px-3 space-y-1">
+                <nav className="admin-scroll flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-3 py-4">
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.path;
@@ -77,74 +112,113 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             <Link
                                 key={item.id}
                                 href={item.path}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                    ? "bg-purple-600/10 text-purple-400 border border-purple-500/20"
-                                    : "hover:bg-white/5 text-gray-500 hover:text-gray-300"
-                                    }`}
+                                title={item.label}
+                                className={`group flex items-center gap-3 rounded-xl px-3.5 py-3 transition-all duration-200 ${
+                                    collapsed ? "md:justify-center md:px-0" : ""
+                                } ${
+                                    isActive
+                                        ? "border border-purple-500/20 bg-purple-600/10 text-purple-500 dark:text-purple-400"
+                                        : "border border-transparent text-[var(--admin-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)]"
+                                }`}
                             >
-                                <Icon size={20} className={isActive ? "text-purple-400" : ""} />
-                                {isSidebarOpen && <span className="font-medium">{item.label}</span>}
-                                {isActive && isSidebarOpen && (
-                                    <motion.div
-                                        layoutId="active-pill"
-                                        className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400"
-                                    />
+                                <Icon size={20} className="shrink-0" />
+                                {showLabels && <span className="truncate font-medium">{item.label}</span>}
+                                {isActive && showLabels && (
+                                    <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-purple-500 dark:bg-purple-400" />
                                 )}
                             </Link>
                         );
                     })}
                 </nav>
 
-                <div className="p-4 mt-auto border-t border-white/5">
+                <div className="mt-auto shrink-0 space-y-1 border-t border-[var(--admin-border-soft)] p-3">
                     <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors"
+                        type="button"
+                        onClick={toggleDarkMode}
+                        title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                        className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)] ${
+                            collapsed ? "md:justify-center md:px-0" : ""
+                        }`}
                     >
-                        <LogOut size={20} />
-                        {isSidebarOpen && <span className="font-medium">Logout</span>}
+                        {darkMode ? <Sun size={20} className="shrink-0" /> : <Moon size={20} className="shrink-0" />}
+                        {showLabels && <span className="font-medium">{darkMode ? "Light mode" : "Dark mode"}</span>}
                     </button>
                     <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="hidden md:flex absolute -right-3 top-20 w-6 h-6 bg-purple-600 rounded-full items-center justify-center text-white border-4 border-[#0a0a0c]"
+                        type="button"
+                        onClick={handleLogout}
+                        title="Logout"
+                        className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-red-500 transition-colors hover:bg-red-500/10 ${
+                            collapsed ? "md:justify-center md:px-0" : ""
+                        }`}
                     >
-                        <motion.span animate={{ rotate: isSidebarOpen ? 0 : 180 }}>
-                            <ChevronRight size={12} />
-                        </motion.span>
+                        <LogOut size={20} className="shrink-0" />
+                        {showLabels && <span className="font-medium">Logout</span>}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setCollapsed((v) => !v)}
+                        className="mt-1 hidden w-full items-center justify-center gap-2 rounded-xl border border-[var(--admin-border-soft)] px-3 py-2 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)] md:flex"
+                        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    >
+                        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                        {!collapsed && <span>Collapse</span>}
                     </button>
                 </div>
-            </motion.aside>
+            </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative h-screen bg-[#0a0a0c]">
-                {/* Header */}
-                <header className="h-20 border-b border-white/5 flex items-center justify-between px-8 sticky top-0 bg-[#0a0a0c]/80 backdrop-blur-xl z-40">
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-xl font-bold text-white">
-                            {activeItem.label}
-                        </h2>
+            {/* Main column */}
+            <div className="flex min-w-0 flex-1 flex-col">
+                <header className="z-30 flex h-16 shrink-0 items-center gap-3 border-b border-[var(--admin-border-soft)] bg-[var(--admin-bg)]/85 px-4 backdrop-blur-xl md:h-20 md:px-6 lg:px-8">
+                    <button
+                        type="button"
+                        onClick={() => setMobileOpen(true)}
+                        className="rounded-xl border border-[var(--admin-border-soft)] p-2.5 text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)] md:hidden"
+                        aria-label="Open sidebar"
+                    >
+                        <Menu size={20} />
+                    </button>
+
+                    <div className="min-w-0">
+                        <h1 className="truncate text-lg font-bold text-[var(--admin-text)] md:text-xl">{activeItem.label}</h1>
+                        <p className="hidden text-xs text-[var(--admin-muted)] sm:block">Manage your portfolio content</p>
                     </div>
 
-                    <div className="flex items-center gap-6">
-                        <div className="relative hidden md:block">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                    <div className="ml-auto flex items-center gap-2 sm:gap-4">
+                        <div className="relative hidden lg:block">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-muted)]" size={17} />
                             <input
                                 type="text"
                                 placeholder="Search anything..."
-                                className="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 w-64"
+                                className="w-56 rounded-full border border-[var(--admin-border)] bg-[var(--admin-soft)] py-2 pl-9 pr-4 text-sm text-[var(--admin-text)] outline-none placeholder:text-[var(--admin-faint)] focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/30 xl:w-64"
                             />
                         </div>
-                        <button className="relative text-gray-400 hover:text-white transition-colors">
-                            <Bell size={20} />
-                            <span className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full border-2 border-[#0a0a0c]" />
+
+                        <button
+                            type="button"
+                            onClick={toggleDarkMode}
+                            className="rounded-xl border border-[var(--admin-border-soft)] p-2.5 text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)]"
+                            aria-label="Toggle theme"
+                        >
+                            {darkMode ? <Sun size={19} /> : <Moon size={19} />}
                         </button>
-                        <div className="h-8 w-[1px] bg-white/10" />
-                        <div className="flex items-center gap-3">
-                            <div className="text-right">
-                                <p className="text-sm font-medium text-white leading-none">Furqan Khattak</p>
-                                <p className="text-xs text-gray-500 mt-1">Super Admin</p>
+
+                        <button
+                            type="button"
+                            className="relative rounded-xl border border-[var(--admin-border-soft)] p-2.5 text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)]"
+                            aria-label="Notifications"
+                        >
+                            <Bell size={19} />
+                            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-purple-500" />
+                        </button>
+
+                        <div className="flex items-center gap-3 border-l border-[var(--admin-border-soft)] pl-2 sm:pl-4">
+                            <div className="hidden text-right sm:block">
+                                <p className="text-sm font-semibold leading-none text-[var(--admin-text)]">Furqan Khattak</p>
+                                <p className="mt-1 text-xs text-[var(--admin-muted)]">Super Admin</p>
                             </div>
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 p-[2px]">
-                                <div className="w-full h-full rounded-full bg-[#111114] flex items-center justify-center text-white font-bold">
+                            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 p-[2px] sm:h-10 sm:w-10">
+                                <div className="flex h-full w-full items-center justify-center rounded-full bg-[var(--admin-panel)] text-xs font-bold text-[var(--admin-text)] sm:text-sm">
                                     FK
                                 </div>
                             </div>
@@ -152,27 +226,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
                 </header>
 
-                {/* Dynamic Content Area */}
-                <div className="p-8 pb-20">
-                    <motion.div
-                        key={pathname}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        {children}
-                    </motion.div>
-                </div>
-            </main>
+                <main id="admin-scroll" className="admin-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
+                    <div className="mx-auto w-full max-w-[1600px] px-4 py-6 pb-24 sm:px-6 lg:px-8">
+                        <motion.div
+                            key={pathname}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {children}
+                        </motion.div>
+                    </div>
+                </main>
+            </div>
         </div>
     );
-}
-
-// Helper components missing from layout scope
-function ChevronRight({ size }: { size: number }) {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m9 18 6-6-6-6" />
-        </svg>
-    )
 }

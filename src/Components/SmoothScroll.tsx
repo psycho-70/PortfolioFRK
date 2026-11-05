@@ -5,11 +5,17 @@ import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { usePathname } from 'next/navigation';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  // Admin dashboard uses its own scroll container; Lenis would swallow the wheel events.
+  const isAdmin = pathname?.startsWith('/admin') ?? false;
+
   useEffect(() => {
+    if (isAdmin) return;
     // Respect users who ask for less motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -39,7 +45,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       gsap.ticker.remove(update);
       lenis.destroy();
     };
-  }, []);
+  }, [isAdmin]);
 
   return <>{children}</>;
 }
