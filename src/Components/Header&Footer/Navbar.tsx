@@ -10,6 +10,7 @@ import { styled } from "@mui/material/styles";
 import { useAppContext } from "@/Context/AppContext";
 // import NavScene from "./NavScene";
 import gsap from "gsap";
+import { getAdminToken } from "@/lib/adminAuth";
 
 const NAV_ITEMS = [
   { id: "home", label: "Home", num: "01", path: "/" },
@@ -65,7 +66,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     try {
-      setIsLogged(!!localStorage.getItem("adminToken"));
+      setIsLogged(!!getAdminToken());
     } catch {
       /* storage unavailable */
     }

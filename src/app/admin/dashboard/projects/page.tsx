@@ -1,4 +1,5 @@
 "use client";
+import { getAdminToken, clearAdminToken } from "@/lib/adminAuth";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -78,7 +79,7 @@ export default function ProjectPage() {
     const fetchProjects = async () => {
         setIsLoading(true);
         try {
-            const token = localStorage.getItem("adminToken");
+            const token = getAdminToken();
             const res = await fetch(`${API_URL}/api/admin/projects`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -89,7 +90,7 @@ export default function ProjectPage() {
                 console.error("Projects API error:", data);
                 setProjects([]);
                 if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem("adminToken");
+                    clearAdminToken();
                     window.location.href = "/admin/login";
                 }
             }
@@ -161,7 +162,7 @@ export default function ProjectPage() {
             return;
         }
 
-        const token = localStorage.getItem("adminToken");
+        const token = getAdminToken();
 
         const data = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
@@ -208,7 +209,7 @@ export default function ProjectPage() {
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this project?")) return;
 
-        const token = localStorage.getItem("adminToken");
+        const token = getAdminToken();
         try {
             const res = await fetch(`${API_URL}/api/admin/projects/${id}`, {
                 method: "DELETE",

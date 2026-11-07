@@ -23,6 +23,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAppContext } from "@/Context/AppContext";
+import { clearAdminToken, getAdminToken } from "@/lib/adminAuth";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [collapsed, setCollapsed] = useState(false);
@@ -32,7 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const { darkMode, toggleDarkMode } = useAppContext();
 
     useEffect(() => {
-        const token = localStorage.getItem("adminToken");
+        const token = getAdminToken();
         if (!token) {
             router.push("/admin/login");
         }
@@ -43,7 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }, [pathname]);
 
     const handleLogout = () => {
-        localStorage.removeItem("adminToken");
+        clearAdminToken();
         router.push("/admin/login");
     };
 
@@ -90,7 +91,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
                     {showLabels && (
                         <div className="min-w-0">
-                            <p className="truncate text-base font-bold tracking-tight text-[var(--admin-text)]">ANTIGRAVITY</p>
+                            <p className="truncate text-base font-bold tracking-tight text-[var(--admin-text)]">Dashboard</p>
                             <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--admin-muted)]">Admin panel</p>
                         </div>
                     )}

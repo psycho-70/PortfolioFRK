@@ -1,4 +1,5 @@
 "use client";
+import { getAdminToken, clearAdminToken } from "@/lib/adminAuth";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -63,7 +64,7 @@ export default function DashboardOverview() {
         const started = performance.now();
 
         try {
-            const token = localStorage.getItem("adminToken");
+            const token = getAdminToken();
             if (!token) {
                 setError("You are not signed in. Please log in again.");
                 setOnline(null);

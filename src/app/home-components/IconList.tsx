@@ -13,11 +13,11 @@ interface Metric {
 }
 
 const metrics: Metric[] = [
-  { icon: Clock, value: 2, suffix: '+', label: 'Years experience' },
-  { icon: Rocket, value: 7, suffix: '+', label: 'Projects shipped' },
+  { icon: Clock, value: 3, suffix: '+', label: 'Years experience' },
+  { icon: Rocket, value: 30, suffix: '+', label: 'Projects shipped' },
   { icon: Smile, value: 8, suffix: '+', label: 'Happy clients' },
   { icon: Trophy, value: 5, suffix: '+', label: 'Awards' },
-  { icon: Code, value: 50, suffix: 'K+', label: 'Lines of code' },
+  { icon: Code, value: 500, suffix: 'K+', label: 'Lines of code' },
   { icon: Star, value: 12, suffix: '+', label: 'Frameworks' },
   { icon: ThumbsUp, value: 98, suffix: '%', label: 'Satisfaction' },
   { icon: Palette, value: 15, suffix: '+', label: 'UI designs' },

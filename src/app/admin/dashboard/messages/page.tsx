@@ -1,4 +1,5 @@
 "use client";
+import { getAdminToken, clearAdminToken } from "@/lib/adminAuth";
 import React, { useState, useEffect } from "react";
 import {
     MessageSquare,
@@ -35,7 +36,7 @@ export default function MessagePage() {
         setIsLoading(true);
         setError(null);
         try {
-            const token = localStorage.getItem("adminToken");
+            const token = getAdminToken();
             const res = await fetch(`${API_URL}/api/contacts`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {}
             });
@@ -66,7 +67,7 @@ export default function MessagePage() {
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this message?")) return;
 
-        const token = localStorage.getItem("adminToken");
+        const token = getAdminToken();
         try {
             const res = await fetch(`${API_URL}/api/contacts/${id}`, {
                 method: "DELETE",

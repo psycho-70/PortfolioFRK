@@ -12,12 +12,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* ───────────── Edit your content here ───────────── */
 const profile = {
-    image: "/furqan.png",
+    image: "/image2.png",
     name: "Furqan Khattak",
     intro:
         "I'm a creative web developer who loves turning ideas into fast, good-looking products. I work across the stack and add a little AI wherever it makes an app smarter.",
-    cv: "/Furqan_Ullah.pdf",
-    badge: { value: "2+", label: "years of experience" },
+    cv: "/Furqan-khan.pdf",
+    badge: { value: "3+", label: "years of experience" },
 };
 
 const story = [

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Lock, User, ShieldCheck, ArrowRight } from "lucide-react";
+import { setAdminToken } from "@/lib/adminAuth";
 
 export default function AdminLogin() {
     const [username, setUsername] = useState("");
@@ -28,7 +29,7 @@ export default function AdminLogin() {
             const data = await res.json();
 
             if (res.ok) {
-                localStorage.setItem("adminToken", data.token);
+                setAdminToken(data.token);
                 router.push("/admin/dashboard");
             } else {
                 setError(data.error || "Authentication failed");

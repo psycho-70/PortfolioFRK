@@ -11,32 +11,49 @@ if (typeof window !== 'undefined') {
 const educationData = [
   {
     id: 0,
-    year: '2020 - 2024',
+    year: '2019 - 2023',
     degree: 'BS Software Engineering',
     institution: 'Kohat University of Science and Technology',
     location: 'Khyber Pakhtunkhwa, Pakistan',
     description:
       'Specialized in modern web technologies, AI fundamentals, and software architecture. Graduated with distinction and led multiple collaborative projects.',
-    achievements: ['CGPA: 3.8/4.0', "Dean's List", 'Best Final Year Project'],
+    achievements: [ "Dean's List", 'Best Final Year Project'],
     icon: '🎓',
     from: '#3b82f6',
     to: '#06b6d4',
   },
   {
     id: 1,
-    year: '2018 - 2020',
+    year: '2017 - 2019',
     degree: 'FSc in ICS',
     institution: 'Wisdom College, Karak',
     location: 'Khyber Pakhtunkhwa, Pakistan',
     description:
       'Focused on computer science fundamentals, programming basics, and mathematics. Built strong foundation for advanced studies in software engineering.',
-    achievements: ['Grade: A+', 'Computer Science Medalist', 'Scholarship Recipient'],
+    achievements: [ 'Computer Science Medalist', 'Scholarship Recipient'],
     icon: '📚',
     from: '#10b981',
     to: '#14b8a6',
   },
   {
-    id: 2,
+  id: 2,
+  year: 'Professional Training',
+  degree: 'Courses & Certifications',
+  institution: 'Professional Development',
+  location: 'Pakistan & International',
+  description:
+    'Continuously expanding my technical skills through professional training in full-stack web development, Generative AI, and computer forensics.',
+  achievements: [
+    'MERN Stack Development – CodeWithHarry (YouTube)',
+    'Generative AI – Akhuwat, Faisalabad',
+    'CHFI – EC-Council, UK'
+  ],
+  icon: '📜',
+  from: '#a855f7',
+  to: '#ec4899',
+},
+  {
+    id: 3,
     year: 'Born & Raised',
     degree: 'District Karak',
     institution: 'Village Ambirikalla',

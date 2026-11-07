@@ -1,4 +1,5 @@
 'use client';
+import { getAdminToken } from "@/lib/adminAuth";
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Briefcase,
@@ -58,34 +59,12 @@ const EMPTY_FORM: Experience = {
   skills: [],
 };
 
-/* ───────── Token helpers (same as SkillsPage) ───────── */
-function readToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  const keys = ['token', 'adminToken', 'authToken', 'accessToken', 'idToken', 'jwt'];
-  for (const k of keys) {
-    const v = localStorage.getItem(k);
-    if (v && v !== 'undefined' && v !== 'null') return v;
-  }
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (!k) continue;
-    const raw = localStorage.getItem(k);
-    if (!raw || raw[0] !== '{') continue;
-    try {
-      const obj = JSON.parse(raw);
-      const t =
-        obj?.token || obj?.accessToken || obj?.idToken || obj?.jwt ||
-        obj?.user?.token || obj?.data?.token;
-      if (typeof t === 'string' && t) return t;
-    } catch {}
-  }
-  return null;
-}
+function readToken(): string | null { return getAdminToken(); }
 
 async function apiFetch(path: string, options: RequestInit = {}) {
   const token = readToken();
   if (!token) {
-    console.error('[apiFetch] No token. Keys:', Object.keys(localStorage));
+    console.error('[apiFetch] No token. Keys:', ["adminToken cookie"]);
     throw new Error('Not logged in — no token found. Please log in again.');
   }
   const res = await fetch(`${API_URL}${path}`, {

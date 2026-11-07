@@ -1,4 +1,5 @@
 "use client";
+import { getAdminToken, clearAdminToken } from "@/lib/adminAuth";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -52,7 +53,7 @@ export default function TeamPage() {
     const fetchTeam = async () => {
         setIsLoading(true);
         try {
-            const token = localStorage.getItem("adminToken");
+            const token = getAdminToken();
             const res = await fetch(`${API_URL}/api/admin/team`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -62,7 +63,7 @@ export default function TeamPage() {
             } else {
                 console.error("Team API error:", data);
                 if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem("adminToken");
+                    clearAdminToken();
                     window.location.href = "/admin/login";
                 }
             }
@@ -129,7 +130,7 @@ export default function TeamPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        const token = localStorage.getItem("adminToken");
+        const token = getAdminToken();
 
         try {
             const data = new FormData();
@@ -182,7 +183,7 @@ export default function TeamPage() {
         if (!id) return;
         if (!confirm("Are you sure you want to remove this team member?")) return;
 
-        const token = localStorage.getItem("adminToken");
+        const token = getAdminToken();
         try {
             const res = await fetch(`${API_URL}/api/admin/team/${id}`, {
                 method: "DELETE",

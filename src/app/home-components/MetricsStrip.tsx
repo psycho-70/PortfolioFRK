@@ -9,8 +9,8 @@ interface Metric {
 }
 
 const METRICS: Metric[] = [
-  { label: 'Years', target: 2 },
-  { label: 'Projects', target: 7 },
+  { label: 'Years', target: 3 },
+  { label: 'Projects', target: 30 },
   { label: 'Clients', target: 8 },
   { label: '% Happy', target: 98 },
 ];

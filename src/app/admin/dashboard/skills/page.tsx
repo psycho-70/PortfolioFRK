@@ -1,4 +1,5 @@
 "use client";
+import { getAdminToken } from "@/lib/adminAuth";
 import React, { useCallback, useEffect, useState } from "react";
 import { Code2, Plus, Trash2, RefreshCw, X } from "lucide-react";
 
@@ -14,39 +15,7 @@ interface Skill {
   numericLevel?: number; // 0-100 derived from `level`
 }
 
-/* ───────────── Token helper ───────────── */
-function readToken(): string | null {
-  if (typeof window === "undefined") return null;
-
-  // 1) plain keys (try all common ones)
-  const keys = ["token", "adminToken", "authToken", "accessToken", "idToken", "jwt"];
-  for (const k of keys) {
-    const v = localStorage.getItem(k);
-    if (v && v !== "undefined" && v !== "null") return v;
-  }
-
-  // 2) nested JSON objects, e.g. localStorage.setItem("admin", JSON.stringify({token, user}))
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (!k) continue;
-    const raw = localStorage.getItem(k);
-    if (!raw || raw[0] !== "{") continue;
-    try {
-      const obj = JSON.parse(raw);
-      const t =
-        obj?.token ||
-        obj?.accessToken ||
-        obj?.idToken ||
-        obj?.jwt ||
-        obj?.user?.token ||
-        obj?.data?.token;
-      if (typeof t === "string" && t) return t;
-    } catch {
-      /* not JSON */
-    }
-  }
-  return null;
-}
+function readToken(): string | null { return getAdminToken(); }
 
 /** fetch wrapper that attaches Authorization: Bearer <token> */
 async function apiFetch(path: string, options: RequestInit = {}) {
@@ -54,7 +23,7 @@ async function apiFetch(path: string, options: RequestInit = {}) {
   if (!token) {
     console.error(
       "[apiFetch] No token in localStorage. Keys present:",
-      Object.keys(localStorage)
+      ["adminToken cookie"]
     );
     throw new Error("Not logged in — no token found. Please log in again.");
   }
