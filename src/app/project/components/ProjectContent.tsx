@@ -1,20 +1,18 @@
 'use client';
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import {
-  ChevronLeft,
-  ChevronRight,
   ExternalLink,
   Github,
   Calendar,
-  Tag,
-  X,
   ArrowUpRight,
   Lock,
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAppContext } from '@/Context/AppContext';
+import { stripHtml } from '@/lib/richText';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -52,33 +50,9 @@ const formatDate = (d: string) => {
   return isNaN(date.getTime()) ? '' : date.toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
 };
 
-// Layout effect in the browser (no flash), plain effect on the server
-const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
-// A temporary copy of the card image that flies between the card and the modal
-const makeGhost = (src: string, r: DOMRect) => {
-  const g = document.createElement('div');
-  Object.assign(g.style, {
-    position: 'fixed',
-    left: `${r.left}px`,
-    top: `${r.top}px`,
-    width: `${r.width}px`,
-    height: `${r.height}px`,
-    backgroundImage: `url("${src}")`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    borderRadius: '16px',
-    zIndex: '60',
-    pointerEvents: 'none',
-    overflow: 'hidden',
-    boxShadow: '0 25px 60px rgba(0,0,0,0.45)',
-  } as Partial<CSSStyleDeclaration>);
-  document.body.appendChild(g);
-  return g;
-};
-
 const ProjectShowcase = () => {
   const { darkMode } = useAppContext();
+  const router = useRouter();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -86,15 +60,10 @@ const ProjectShowcase = () => {
   const [reloadKey, setReloadKey] = useState(0);
 
   const [filter, setFilter] = useState('All');
-  const [active, setActive] = useState<Project | null>(null);
-  const [imgIdx, setImgIdx] = useState(0);
 
   const rootRef = useRef<HTMLElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const closing = useRef(false);
   const switching = useRef(false);
   const firstFilter = useRef(true);
-  const originRef = useRef<DOMRect | null>(null);
 
   const prefersReduced = () =>
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -319,135 +288,8 @@ const ProjectShowcase = () => {
     gsap.to(e.currentTarget, { rotateY: 0, rotateX: 0, duration: 0.6, ease: 'power3.out' });
   };
 
-  /* ---------------- Detail modal ---------------- */
-  const openProject = (p: Project, card?: HTMLElement | null) => {
-    // Remember where the card image is, so the modal image can fly out of it
-    const box = card?.querySelector('.pj-imgbox');
-    originRef.current = box ? box.getBoundingClientRect() : null;
-    setImgIdx(0);
-    setActive(p);
-  };
-
-  // Open: the card image flies into the modal, the rest fades / slides in
-  useIsoLayoutEffect(() => {
-    if (!active) return;
-    const overlay = modalRef.current;
-    if (!overlay) return;
-
-    document.body.style.overflow = 'hidden';
-    overlay.querySelector<HTMLElement>('.pm-close')?.focus();
-
-    const main = overlay.querySelector<HTMLElement>('.pm-main');
-    let ghost: HTMLDivElement | null = null;
-
-    const ctx = gsap.context(() => {
-      if (prefersReduced()) return;
-
-      const tl = gsap.timeline();
-      tl.from(overlay, { opacity: 0, duration: 0.3 }, 0)
-        .from('.pm-panel', { opacity: 0, duration: 0.35 }, 0.05)
-        .from('.pm-info', { x: 90, opacity: 0, duration: 0.65, ease: 'power3.out' }, 0.3)
-        .from('.pm-badge', { x: 40, opacity: 0, scale: 0.8, duration: 0.45, ease: 'back.out(1.6)' }, 0.4)
-        .from('.pm-heading', { y: 40, opacity: 0, scale: 0.85, transformOrigin: '0% 50%', duration: 0.6, ease: 'power3.out' }, 0.45)
-        .from('.pm-thumb', { y: 20, opacity: 0, scale: 0.8, stagger: 0.06, duration: 0.4, ease: 'back.out(1.6)', clearProps: 'all' }, 0.7)
-        .from('.pm-chip', { y: 14, opacity: 0, scale: 0.8, stagger: 0.05, duration: 0.4, ease: 'back.out(1.6)', clearProps: 'all' }, 0.7)
-        .from('.pm-actions', { y: 20, opacity: 0, duration: 0.4, ease: 'power3.out' }, 0.85);
-
-      const origin = originRef.current;
-      if (origin && main) {
-        const target = main.getBoundingClientRect();
-        gsap.set(main, { opacity: 0 });
-        ghost = makeGhost(active.images[0], origin);
-        tl.to(
-          ghost,
-          {
-            left: target.left,
-            top: target.top,
-            width: target.width,
-            height: target.height,
-            duration: 0.75,
-            ease: 'power3.inOut',
-            onComplete: () => {
-              ghost?.remove();
-              ghost = null;
-              gsap.set(main, { opacity: 1 });
-            },
-          },
-          0.05
-        );
-      } else if (main) {
-        tl.from(main, { scale: 0.9, opacity: 0, duration: 0.6, ease: 'power3.out' }, 0.2);
-      }
-    }, overlay);
-
-    return () => {
-      ctx.revert();
-      ghost?.remove();
-      document.body.style.overflow = '';
-    };
-  }, [active]);
-
-  // Close: the image flies back into its card
-  const closeModal = useCallback(() => {
-    const overlay = modalRef.current;
-    if (!overlay || closing.current) return;
-    if (prefersReduced() || !active) {
-      setActive(null);
-      return;
-    }
-
-    closing.current = true;
-    const main = overlay.querySelector<HTMLElement>('.pm-main');
-    const origin = originRef.current;
-    let ghost: HTMLDivElement | null = null;
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        ghost?.remove();
-        closing.current = false;
-        setActive(null);
-      },
-    });
-
-    if (origin && main) {
-      ghost = makeGhost(active.images[imgIdx] ?? active.images[0], main.getBoundingClientRect());
-      gsap.set(main, { opacity: 0 });
-      tl.to(
-        ghost,
-        { left: origin.left, top: origin.top, width: origin.width, height: origin.height, duration: 0.6, ease: 'power3.inOut' },
-        0
-      );
-      tl.to(overlay.querySelector('.pm-panel'), { opacity: 0, duration: 0.3, ease: 'power2.in' }, 0)
-        .to(overlay, { opacity: 0, duration: 0.4 }, 0.2);
-    } else {
-      tl.to(overlay.querySelector('.pm-panel'), { scale: 0.9, y: 30, opacity: 0, duration: 0.3, ease: 'power2.in' }, 0)
-        .to(overlay, { opacity: 0, duration: 0.3 }, 0.05);
-    }
-  }, [active, imgIdx]);
-
-  const changeImage = useCallback(
-    (next: number, dir: number) => {
-      if (!active) return;
-      const total = active.images.length;
-      setImgIdx(((next % total) + total) % total);
-      if (!prefersReduced()) {
-        gsap.fromTo('.pm-main', { opacity: 0, x: dir * 50, scale: 0.97 }, { opacity: 1, x: 0, scale: 1, duration: 0.45, ease: 'power3.out' });
-      }
-    },
-    [active]
-  );
-
-  // Keyboard: Esc closes, arrows change image
-  useEffect(() => {
-    if (!active) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal();
-      if (e.key === 'ArrowRight') changeImage(imgIdx + 1, 1);
-      if (e.key === 'ArrowLeft') changeImage(imgIdx - 1, -1);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [active, imgIdx, closeModal, changeImage]);
+  /* ---------------- Open the dynamic project page ---------------- */
+  const openProject = (p: Project) => router.push(`/project/${p.id}`);
 
   /* ---------------- Theme helpers ---------------- */
   const text = darkMode ? 'text-white' : 'text-gray-900';
@@ -459,8 +301,6 @@ const ProjectShowcase = () => {
   const chipCls = darkMode
     ? 'border-white/15 bg-white/[0.06] text-gray-200'
     : 'border-purple-200 bg-purple-50 text-gray-700';
-  const panelBg = darkMode ? 'bg-[#120d28] border-white/15' : 'bg-white border-gray-200';
-  const tile = darkMode ? 'bg-white/[0.06] border-white/10' : 'bg-gray-50 border-gray-200';
   const strokeColor = darkMode ? 'rgba(192,132,252,0.45)' : 'rgba(124,58,237,0.35)';
 
   return (
@@ -592,14 +432,14 @@ const ProjectShowcase = () => {
               return (
                 <article key={p.id} className={`pj-card ${featured ? 'lg:col-span-2' : ''}`}>
                   <div
-                    role="button"
+                    role="link"
                     tabIndex={0}
                     aria-label={`Open details for ${p.title}`}
-                    onClick={(e) => openProject(p, e.currentTarget)}
+                    onClick={() => openProject(p)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        openProject(p, e.currentTarget);
+                        openProject(p);
                       }
                     }}
                     onMouseMove={onTiltMove}
@@ -650,7 +490,7 @@ const ProjectShowcase = () => {
                         className={`mt-3 text-sm leading-relaxed ${soft}`}
                         style={{ display: '-webkit-box', WebkitLineClamp: featured ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
                       >
-                        {p.description}
+                        {stripHtml(p.description)}
                       </p>
 
                       {p.technologies.length > 0 && (
@@ -707,153 +547,6 @@ const ProjectShowcase = () => {
           </div>
         )}
       </div>
-
-      {/* ---------- Detail modal ---------- */}
-      {active && (
-        <div
-          ref={modalRef}
-          // data-lenis-prevent lets the modal scroll natively while smooth scroll is active
-          data-lenis-prevent
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4"
-          onClick={closeModal}
-          role="dialog"
-          aria-modal="true"
-          aria-label={active.title}
-        >
-          <div
-            className={`pm-panel relative max-h-[92vh] w-full max-w-5xl overflow-y-auto overscroll-contain rounded-3xl border ${panelBg}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={closeModal}
-              aria-label="Close"
-              className={`pm-close absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-red-500 hover:text-white ${
-                darkMode ? 'bg-black/50 text-white' : 'bg-white/90 text-gray-800 shadow'
-              }`}
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            <div className="grid gap-0 lg:grid-cols-[1.15fr_1fr]">
-              {/* Media */}
-              <div className="pm-media p-4 md:p-6">
-                <div className="pm-main relative aspect-video overflow-hidden rounded-2xl">
-                  <Image
-                    src={active.images[imgIdx]}
-                    alt={`${active.title} - image ${imgIdx + 1}`}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 600px"
-                    className="object-cover"
-                    priority
-                  />
-                  {active.images.length > 1 && (
-                    <>
-                      <button
-                        type="button"
-                        aria-label="Previous image"
-                        onClick={() => changeImage(imgIdx - 1, -1)}
-                        className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-transform hover:scale-110"
-                      >
-                        <ChevronLeft className="h-5 w-5" />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Next image"
-                        onClick={() => changeImage(imgIdx + 1, 1)}
-                        className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-transform hover:scale-110"
-                      >
-                        <ChevronRight className="h-5 w-5" />
-                      </button>
-                    </>
-                  )}
-                </div>
-
-                {active.images.length > 1 && (
-                  <div className="mt-3 grid grid-cols-4 gap-3">
-                    {active.images.map((img, i) => (
-                      <button
-                        key={img + i}
-                        type="button"
-                        aria-label={`Show image ${i + 1}`}
-                        onClick={() => changeImage(i, i > imgIdx ? 1 : -1)}
-                        className={`pm-thumb relative aspect-video overflow-hidden rounded-lg transition-all duration-300 ${
-                          i === imgIdx
-                            ? 'scale-105 ring-2 ring-purple-500 ring-offset-2 ' + (darkMode ? 'ring-offset-[#120d28]' : 'ring-offset-white')
-                            : 'opacity-60 hover:opacity-100'
-                        }`}
-                      >
-                        <Image
-                        unoptimized src={img} alt="" fill sizes="150px" className="object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="pm-info flex flex-col p-6 pt-2 md:p-8 lg:pt-8">
-                <div className="mb-4 flex flex-wrap items-center gap-3 pr-10">
-                  <span className="pm-badge rounded-full px-4 py-1 text-sm font-semibold text-white" style={{ background: grad(active) }}>
-                    {active.category}
-                  </span>
-                  <span className={`flex items-center text-sm ${muted}`}>
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {formatDate(active.date)}
-                  </span>
-                </div>
-
-                <h2 className={`pm-heading text-3xl font-black leading-tight md:text-4xl ${text}`}>{active.title}</h2>
-                <p className={`mt-4 text-base leading-relaxed md:text-lg ${soft}`}>{active.longDescription}</p>
-
-                {active.technologies.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className={`mb-3 flex items-center text-sm font-semibold uppercase tracking-widest ${muted}`}>
-                      <Tag className="mr-2 h-4 w-4" /> Technologies
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {active.technologies.map((t) => (
-                        <span key={t} className={`pm-chip rounded-full border px-3 py-1 text-sm font-medium ${chipCls}`}>
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="pm-actions mt-auto flex flex-wrap gap-3 pt-8">
-                  {active.isConfidential ? (
-                    <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 text-sm ${tile} ${soft}`}>
-                      <Lock className="h-5 w-5 shrink-0 text-purple-500" />
-                      This is a confidential project, so the demo and code are private. Contact me to learn more.
-                    </div>
-                  ) : (
-                    <>
-                      <a
-                        href={active.live}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center rounded-full px-6 py-3 font-semibold text-white shadow-lg transition-transform hover:scale-105"
-                        style={{ background: grad(active) }}
-                      >
-                        <ExternalLink className="mr-2 h-5 w-5" /> Live Demo
-                      </a>
-                      <a
-                        href={active.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex items-center rounded-full border px-6 py-3 font-semibold transition-transform hover:scale-105 ${tile} ${text}`}
-                      >
-                        <Github className="mr-2 h-5 w-5" /> View Code
-                      </a>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 };

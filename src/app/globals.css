@@ -520,3 +520,226 @@ html:not(.dark) .admin-root .bg-orange-600 {
     background: var(--admin-scroll-thumb, rgba(148, 163, 184, 0.45));
     border-radius: 999px;
 }
+
+/* ===== RICH TEXT (admin editor + public project page) ===== */
+
+.rte-content {
+    line-height: 1.7;
+    word-break: break-word;
+}
+
+.rte-content:empty::before {
+    content: attr(data-placeholder);
+    color: var(--admin-faint);
+    pointer-events: none;
+}
+
+.rte-content p {
+    margin: 0 0 0.6em;
+}
+
+.rte-content div {
+    margin: 0 0 0.6em;
+}
+
+.rte-content p:last-child,
+.rte-content > :last-child {
+    margin-bottom: 0;
+}
+
+.rte-content h2,
+.rte-content h3,
+.rte-content h4 {
+    margin: 0.9em 0 0.45em;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.rte-content h2 {
+    font-size: 1.35rem;
+}
+
+.rte-content h3 {
+    font-size: 1.15rem;
+}
+
+.rte-content h4 {
+    font-size: 1rem;
+}
+
+.rte-content ul,
+.rte-content ol {
+    margin: 0.5em 0 0.8em;
+    padding-left: 1.4em;
+}
+
+.rte-content ul {
+    list-style: disc;
+}
+
+.rte-content ol {
+    list-style: decimal;
+}
+
+.rte-content li {
+    margin: 0.2em 0;
+}
+
+.rte-content a {
+    color: #a855f7;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.rte-content blockquote {
+    margin: 0.75em 0;
+    border-left: 3px solid #a855f7;
+    padding: 0.15em 0 0.15em 0.9em;
+    color: var(--admin-muted);
+}
+
+.rte-content pre {
+    margin: 0.75em 0;
+    overflow-x: auto;
+    border-radius: 0.6rem;
+    background: var(--admin-soft-3);
+    padding: 0.75em 0.9em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85em;
+    white-space: pre-wrap;
+}
+
+.rte-content code {
+    border-radius: 0.35rem;
+    background: var(--admin-soft-3);
+    padding: 0.12em 0.35em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+}
+
+.rte-content hr {
+    margin: 1em 0;
+    border-color: var(--admin-border);
+}
+
+.project-rich {
+    color: #334155;
+    font-size: 1rem;
+    line-height: 1.8;
+    word-break: break-word;
+}
+
+.dark .project-rich {
+    color: #cbd5e1;
+}
+
+.project-rich p {
+    margin: 0 0 1em;
+}
+
+.project-rich div {
+    margin: 0 0 1em;
+}
+
+.project-rich h2,
+.project-rich h3,
+.project-rich h4 {
+    margin: 1.6em 0 0.6em;
+    color: #0f172a;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.dark .project-rich h2,
+.dark .project-rich h3,
+.dark .project-rich h4 {
+    color: #ffffff;
+}
+
+.project-rich h2 {
+    font-size: 1.6rem;
+}
+
+.project-rich h3 {
+    font-size: 1.3rem;
+}
+
+.project-rich h4 {
+    font-size: 1.1rem;
+}
+
+.project-rich ul,
+.project-rich ol {
+    margin: 0 0 1.1em;
+    padding-left: 1.5em;
+}
+
+.project-rich ul {
+    list-style: disc;
+}
+
+.project-rich ol {
+    list-style: decimal;
+}
+
+.project-rich li {
+    margin: 0.35em 0;
+}
+
+.project-rich a {
+    color: #9333ea;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.dark .project-rich a {
+    color: #c084fc;
+}
+
+.project-rich blockquote {
+    margin: 1.2em 0;
+    border-left: 4px solid #a855f7;
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: rgba(168, 85, 247, 0.08);
+    padding: 0.8em 1.1em;
+    color: #475569;
+}
+
+.dark .project-rich blockquote {
+    color: #cbd5e1;
+}
+
+.project-rich pre {
+    margin: 1.2em 0;
+    overflow-x: auto;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: #0f172a;
+    padding: 1em 1.2em;
+    color: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+}
+
+.project-rich code {
+    border-radius: 0.35rem;
+    background: rgba(168, 85, 247, 0.12);
+    padding: 0.15em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+}
+
+.project-rich pre code {
+    background: transparent;
+    padding: 0;
+}
+
+.project-rich hr {
+    margin: 1.8em 0;
+    border-color: rgba(148, 163, 184, 0.35);
+}
+
+.project-rich > :last-child {
+    margin-bottom: 0;
+}

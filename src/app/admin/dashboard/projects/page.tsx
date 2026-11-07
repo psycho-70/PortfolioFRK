@@ -1,5 +1,7 @@
 "use client";
 import { getAdminToken, clearAdminToken } from "@/lib/adminAuth";
+import { stripHtml } from "@/lib/richText";
+import RichTextEditor from "@/Components/RichTextEditor/RichTextEditor";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -154,6 +156,11 @@ export default function ProjectPage() {
         e.preventDefault();
         if (isSaving) return;
 
+        if (!stripHtml(formData.description)) {
+            setFormError("Short description is required.");
+            return;
+        }
+
         const totalSize = selectedFiles.reduce((sum, f) => sum + f.size, 0);
         if (totalSize > MAX_TOTAL_BYTES) {
             setFormError(
@@ -267,7 +274,7 @@ export default function ProjectPage() {
                                             )}
                                             <div>
                                                 <p className="text-[var(--admin-text)] font-medium">{project.title}</p>
-                                                <p className="text-xs text-[var(--admin-muted)] truncate max-w-[200px]">{project.description}</p>
+                                                <p className="text-xs text-[var(--admin-muted)] truncate max-w-[200px]">{stripHtml(project.description)}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -352,22 +359,30 @@ export default function ProjectPage() {
 
                             <div>
                                 <label className="text-xs text-[var(--admin-muted)] block mb-1">Short Description</label>
-                                <textarea
+                                <RichTextEditor
                                     value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    required
-                                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 h-20"
+                                    onChange={(html) => setFormData((prev) => ({ ...prev, description: html }))}
+                                    placeholder="A one-paragraph summary shown on the project card…"
+                                    minHeight={110}
+                                    ariaLabel="Short description"
                                 />
+                                <p className="text-[10px] text-[var(--admin-faint)] mt-1">
+                                    Shown on the project card and at the top of the project page.
+                                </p>
                             </div>
 
                             <div>
                                 <label className="text-xs text-[var(--admin-muted)] block mb-1">Long Description (Content Editor)</label>
-                                <textarea
+                                <RichTextEditor
                                     value={formData.longDescription}
-                                    onChange={(e) => setFormData({ ...formData, longDescription: e.target.value })}
-                                    className="w-full bg-[var(--admin-soft)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 h-40"
-                                    placeholder="Detailed overview of the project..."
+                                    onChange={(html) => setFormData((prev) => ({ ...prev, longDescription: html }))}
+                                    placeholder="Detailed overview — use headings, lists, links and quotes to structure the story…"
+                                    minHeight={220}
+                                    ariaLabel="Long description"
                                 />
+                                <p className="text-[10px] text-[var(--admin-faint)] mt-1">
+                                    Full case study shown on the project detail page. Leave empty to reuse the short description.
+                                </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
